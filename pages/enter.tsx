@@ -1,9 +1,6 @@
 import type { NextPage } from "next";
 import { useState } from "react";
-
-const classToString = (...classNames: string[]) => {
-  return classNames.join(" ");
-};
+import { classToString } from "../libs/utils";
 
 const Enter: NextPage = () => {
   const [method, setMethod] = useState<"email" | "phone">("email");
@@ -75,7 +72,7 @@ const Enter: NextPage = () => {
             )}
             <button
               type="submit"
-              className=" bg-orange-400 mt-4 rounded-sm text-white font-semibold py-2"
+              className=" focus:outline-none hover:bg-orange-500 active:bg-orange-300 ring-2 ring-offset-2 ring-orange-400 bg-orange-400 mt-4 rounded-sm text-white font-semibold py-2"
             >
               {method === "email" && "Get Email Link"}
               {method === "phone" && "Get One-time Password"}

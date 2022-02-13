@@ -24,26 +24,35 @@ const upload: NextPage = () => {
         </label>
       </div>
       <div>
-        <form className="flex flex-col">
-          <label className="py-1 text-sm font-semibold mt-1">Title</label>
+        <form className="flex flex-col space-y-2">
+          <label htmlFor="title" className="py-1 text-sm font-semibold">
+            Title
+          </label>
           <input
+            id="title"
             placeholder="Title"
             type="text"
             className="appearance-none mt-2 border-gray-400 focus:border-orange-400 focus:ring-orange-400 rounded-md "
           />
 
-          <label className="py-1 text-sm font-semibold mt-1">Price</label>
+          <label htmlFor="price" className="py-1 text-sm font-semibold">
+            Price
+          </label>
           <input
+            id="price"
             placeholder="$ Price"
             type="number"
             className="appearance-none mt-2 border-gray-400 focus:border-orange-400 focus:ring-orange-400 rounded-md "
           />
-          <label className="py-1 text-sm font-semibold mt-1">Description</label>
+          <label htmlFor="description" className="py-1 text-sm font-semibold">
+            Description
+          </label>
           <textarea
+            id="description"
             placeholder="Description"
             className="appearance-none mt-2 h-48 border-gray-400 focus:border-orange-400 focus:ring-orange-400 rounded-md "
           />
-          <button className="mt-5 bg-orange-400 w-full text-white rounded-sm py-1 ring-2 ring-offset-1 ring-orange-400 hover:bg-orange-500 active:bg-orange-300">
+          <button className="focus:outline-none mt-5 bg-orange-400 w-full text-white rounded-sm py-1 ring-2 ring-offset-1 ring-orange-400 hover:bg-orange-500 active:bg-orange-300">
             Upload Product
           </button>
         </form>
