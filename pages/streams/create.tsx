@@ -1,37 +1,35 @@
 import type { NextPage } from "next";
+import Input from "../../components/Input";
 import SubmitButton from "../../components/submit-button";
+import Textarea from "../../components/Textarea";
 
 const Create: NextPage = () => {
   return (
     <div className="py-16 px-4">
       <form className="flex flex-col space-y-2">
-        <label htmlFor="title" className="py-1 text-sm font-semibold">
-          Title
-        </label>
-        <input
-          id="title"
+        <Input
           placeholder="Title"
+          name="title"
           type="text"
-          className="appearance-none mt-2 border-gray-400 focus:border-orange-400 focus:ring-orange-400 rounded-md "
+          id="title"
+          label="Title"
+        />
+        <Input
+          placeholder="$ Price"
+          name="price"
+          type="number"
+          id="price"
+          label="price"
+        />
+        <Textarea
+          placeholder="Description"
+          name="description"
+          type="text"
+          id="description"
+          label="description"
+          rows={7}
         />
 
-        <label htmlFor="price" className="py-1 text-sm font-semibold">
-          Price
-        </label>
-        <input
-          id="price"
-          placeholder="$ Price"
-          type="number"
-          className="appearance-none mt-2 border-gray-400 focus:border-orange-400 focus:ring-orange-400 rounded-md "
-        />
-        <label htmlFor="description" className="py-1 text-sm font-semibold">
-          Description
-        </label>
-        <textarea
-          id="description"
-          placeholder="Description"
-          className="appearance-none mt-2 h-48 border-gray-400 focus:border-orange-400 focus:ring-orange-400 rounded-md "
-        />
         <SubmitButton payload="Upload Product" />
       </form>
     </div>

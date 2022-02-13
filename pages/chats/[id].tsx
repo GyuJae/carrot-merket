@@ -32,10 +32,23 @@ const ChatDetail: NextPage = () => {
           <div className="flex w-full">
             <input
               type="text"
-              className="w-full focus:ring-orange-500 rounded-md border-gray-300 focus:border-orange-500"
+              className="w-full focus:ring-orange-500 rounded-l-md border-gray-300 focus:border-orange-500 focus:border-l-0"
             />
-            <div className="p-2 bg-orange-400 text-white font-semibold rounded-r-md ml-1 cursor-pointer">
-              <span>&rarr;</span>
+            <div className="p-2 bg-orange-400 ml-1 text-white font-semibold rounded-r-md cursor-pointer">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
+              </svg>
             </div>
           </div>
         </div>

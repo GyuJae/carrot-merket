@@ -1,4 +1,5 @@
 import type { NextPage } from "next";
+import Input from "../../components/Input";
 import Layout from "../../components/layout";
 import SubmitButton from "../../components/submit-button";
 
@@ -17,12 +18,12 @@ const Edit: NextPage = () => {
           <input id="avatar" type="file" accept="image/*" className="hidden" />
         </div>
         <div className="flex flex-col py-2">
-          <label className="py-2 text-sm font-semibold">Email Address</label>
-          <input
+          <Input
             type="email"
             placeholder="Enter your Email"
             required
-            className="appearance-none outline-none px-3 py-3 rounded-sm shadow-sm border-gray-300 placeholder-gray-300 focus:border-orange-400 ring-1 focus:ring-orange-400   "
+            label="Email Address"
+            name="email"
           />
         </div>
         <div className="flex flex-col py-2">
@@ -31,11 +32,12 @@ const Edit: NextPage = () => {
             <div className="flex justify-center items-center bg-gray-200 text-gray-400 px-2 rounded-l-lg">
               +82
             </div>
-            <input
+            <Input
               type="number"
               placeholder="Enter your Phone Number"
               required
-              className="appearance-none outline-none w-full px-3 py-3 rounded-sm shadow-sm border-gray-300 placeholder-gray-300 focus:border-orange-400 ring-1 focus:ring-orange-400   "
+              label="phone"
+              name="phone"
             />
           </div>
         </div>

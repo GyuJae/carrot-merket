@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { useState } from "react";
+import Input from "../components/Input";
 import SubmitButton from "../components/submit-button";
 import { classToString } from "../libs/utils";
 
@@ -41,17 +42,15 @@ const Enter: NextPage = () => {
         <div className="w-full py-5">
           <form className="flex flex-col">
             {method === "email" && (
-              <>
-                <label className="py-2 text-sm font-semibold">
-                  Email Address
-                </label>
-                <input
+              <div>
+                <Input
+                  label="Email Address"
                   type="email"
-                  placeholder="Enter your Email"
+                  name="email"
                   required
-                  className="appearance-none outline-none px-3 py-3 rounded-sm shadow-sm border-gray-300 placeholder-gray-300 focus:border-orange-400 ring-1 focus:ring-orange-400   "
+                  placeholder="Email Address"
                 />
-              </>
+              </div>
             )}
             {method === "phone" && (
               <>
@@ -62,11 +61,12 @@ const Enter: NextPage = () => {
                   <div className="flex justify-center items-center bg-gray-200 text-gray-400 px-2 rounded-l-lg">
                     +82
                   </div>
-                  <input
+                  <Input
+                    label="Phone Number"
                     type="number"
-                    placeholder="Enter your Phone Number"
+                    name="phone"
                     required
-                    className="appearance-none outline-none w-full px-3 py-3 rounded-sm shadow-sm border-gray-300 placeholder-gray-300 focus:border-orange-400 ring-1 focus:ring-orange-400   "
+                    placeholder="Phone Number"
                   />
                 </div>
               </>
