@@ -4,7 +4,7 @@ import Layout from "../components/layout";
 const Home: NextPage = () => {
   return (
     <Layout title="홈" hasTabBar>
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-2 ">
         <button className="fixed bottom-24 right-3 bg-orange-400 hover:bg-orange-500 active:bg-orange-300 transition-colors p-2 rounded-full text-white">
           <svg
             className="h-6 w-6"

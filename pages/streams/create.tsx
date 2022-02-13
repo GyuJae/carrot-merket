@@ -1,4 +1,5 @@
 import type { NextPage } from "next";
+import SubmitButton from "../../components/submit-button";
 
 const Create: NextPage = () => {
   return (
@@ -31,9 +32,7 @@ const Create: NextPage = () => {
           placeholder="Description"
           className="appearance-none mt-2 h-48 border-gray-400 focus:border-orange-400 focus:ring-orange-400 rounded-md "
         />
-        <button className="focus:outline-none mt-5 bg-orange-400 w-full text-white rounded-sm py-1 ring-2 ring-offset-1 ring-orange-400 hover:bg-orange-500 active:bg-orange-300">
-          Upload Product
-        </button>
+        <SubmitButton payload="Upload Product" />
       </form>
     </div>
   );

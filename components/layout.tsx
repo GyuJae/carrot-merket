@@ -27,11 +27,11 @@ export default function Layout({
       <div
         className={classToString(
           !canGoBack ? "justify-center" : "",
-          "bg-white w-full max-w-xl text-lg px-10 font-medium py-3 fixed text-gray-800 border-b top-0  flex items-center"
+          "bg-white w-full max-w-xl text-lg px-3 font-medium py-3 fixed text-gray-800 border-b top-0  flex items-center"
         )}
       >
         {canGoBack ? (
-          <button onClick={onClick}>
+          <button onClick={onClick} className="mr-3">
             <svg
               className="w-6 h-6"
               fill="none"

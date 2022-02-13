@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import { useState } from "react";
+import SubmitButton from "../components/submit-button";
 import { classToString } from "../libs/utils";
 
 const Enter: NextPage = () => {
@@ -70,13 +71,11 @@ const Enter: NextPage = () => {
                 </div>
               </>
             )}
-            <button
-              type="submit"
-              className=" focus:outline-none hover:bg-orange-500 active:bg-orange-300 ring-2 ring-offset-2 ring-orange-400 bg-orange-400 mt-4 rounded-sm text-white font-semibold py-2"
-            >
-              {method === "email" && "Get Email Link"}
-              {method === "phone" && "Get One-time Password"}
-            </button>
+            <SubmitButton
+              payload={
+                method === "email" ? "Get Email Link" : "Get One-time Password"
+              }
+            />
           </form>
         </div>
       </div>
