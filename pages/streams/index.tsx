@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import Layout from "../../components/layout";
+import StreamItem from "../../components/StreamItem";
 
 const Streams: NextPage = () => {
   return (
@@ -7,12 +8,11 @@ const Streams: NextPage = () => {
       <div className="px-4">
         <div className="divide-y-[1.5px]">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-            <div key={i} className="py-4 cursor-pointer">
-              <div className="w-full h-48 bg-gray-400 rounded-md" />
-              <div className="mt-2 px-2 hover:underline">
-                Title: Let go gyutae
-              </div>
-            </div>
+            <StreamItem
+              key={i}
+              title={"Title: gyutae eat buldak"}
+              thumbnail={""}
+            />
           ))}
         </div>
         <button className="fixed bottom-24 right-3 bg-orange-400 hover:bg-orange-500 active:bg-orange-300 transition-colors p-2 rounded-full text-white">
