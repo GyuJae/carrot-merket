@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 
 import { useRouter } from "next/router";
-import { classToString } from "../libs/utils";
+import { classToString } from "../libs/client/utils";
 
 interface LayoutProps {
   title?: string;

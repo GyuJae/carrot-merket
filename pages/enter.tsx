@@ -1,13 +1,42 @@
+import { enterFetch } from "@libs/client/apis/enter";
+import { classToString } from "@libs/client/utils";
 import type { NextPage } from "next";
 import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useMutation } from "react-query";
 import Input from "../components/Input";
 import SubmitButton from "../components/submit-button";
-import { classToString } from "../libs/utils";
+
+interface IEnterForm {
+  email?: string;
+  phone?: number;
+}
 
 const Enter: NextPage = () => {
   const [method, setMethod] = useState<"email" | "phone">("email");
-  const setEmail = () => setMethod("email");
-  const setPhone = () => setMethod("phone");
+  const { register, handleSubmit, reset } = useForm<IEnterForm>();
+
+  const { mutate, isLoading } = useMutation(
+    (data: IEnterForm) => enterFetch(data),
+    {
+      onSuccess: (result) => {
+        console.log(result);
+      },
+    }
+  );
+
+  const setEmail = () => {
+    reset();
+    setMethod("email");
+  };
+  const setPhone = () => {
+    reset();
+    setMethod("phone");
+  };
+
+  const onSubmit: SubmitHandler<IEnterForm> = (data) => {
+    mutate(data);
+  };
 
   return (
     <div className="flex flex-col items-center">
@@ -40,7 +69,7 @@ const Enter: NextPage = () => {
       </div>
       <div className="flex flex-col w-full px-3 mb-5">
         <div className="w-full py-5">
-          <form className="flex flex-col">
+          <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
             {method === "email" && (
               <div>
                 <Input
@@ -49,6 +78,7 @@ const Enter: NextPage = () => {
                   name="email"
                   required
                   placeholder="Email Address"
+                  register={register("email")}
                 />
               </div>
             )}
@@ -67,13 +97,18 @@ const Enter: NextPage = () => {
                     name="phone"
                     required
                     placeholder="Phone Number"
+                    register={register("phone")}
                   />
                 </div>
               </>
             )}
             <SubmitButton
               payload={
-                method === "email" ? "Get Email Link" : "Get One-time Password"
+                isLoading
+                  ? "loading..."
+                  : method === "email"
+                  ? "Get Email Link"
+                  : "Get One-time Password"
               }
             />
           </form>

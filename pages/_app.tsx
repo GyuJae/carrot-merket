@@ -1,11 +1,16 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const queryClient = new QueryClient();
+
   return (
-    <div className="w-full max-w-xl mx-auto">
-      <Component {...pageProps} />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <div className="w-full max-w-xl mx-auto">
+        <Component {...pageProps} />
+      </div>
+    </QueryClientProvider>
   );
 }
 
