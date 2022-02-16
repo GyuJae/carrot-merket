@@ -19,8 +19,8 @@ const Enter: NextPage = () => {
   const { mutate, isLoading } = useMutation(
     (data: IEnterForm) => enterFetch(data),
     {
-      onSuccess: (result) => {
-        console.log(result);
+      onSuccess: (r) => {
+        console.log(r);
       },
     }
   );
