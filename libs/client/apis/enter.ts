@@ -1,3 +1,5 @@
+import { json } from "stream/consumers";
+
 interface IEnterForm {
   email?: string;
   phone?: number;
@@ -10,4 +12,4 @@ export const enterFetch = (data: IEnterForm) =>
     headers: {
       "Content-Type": "application/json",
     },
-  });
+  }).then((res) => res.json());

@@ -1,11 +1,14 @@
+import TokenForm from "@components/TokenForm";
 import { enterFetch } from "@libs/client/apis/enter";
 import { classToString } from "@libs/client/utils";
+import { Token } from "@prisma/client";
 import type { NextPage } from "next";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import Input from "../components/Input";
 import SubmitButton from "../components/submit-button";
+import { IEnterResponse } from "./api/users/enter";
 
 interface IEnterForm {
   email?: string;
@@ -13,14 +16,23 @@ interface IEnterForm {
 }
 
 const Enter: NextPage = () => {
+  const [tokenObj, setTokenObj] = useState<{
+    ok: boolean;
+    token?: Token | null;
+  }>({ ok: false, token: null });
   const [method, setMethod] = useState<"email" | "phone">("email");
   const { register, handleSubmit, reset } = useForm<IEnterForm>();
 
   const { mutate, isLoading } = useMutation(
     (data: IEnterForm) => enterFetch(data),
     {
-      onSuccess: (result) => {
-        console.log(result);
+      onSuccess: ({ ok, token }: IEnterResponse) => {
+        if (ok) {
+          setTokenObj({
+            ok,
+            token,
+          });
+        }
       },
     }
   );
@@ -43,77 +55,85 @@ const Enter: NextPage = () => {
       <div className="flex justify-center items-center py-10">
         <h3 className="font-semibold text-2xl">Enter to Carrot</h3>
       </div>
-      <div className="flex justify-around w-full">
-        <div
-          onClick={setEmail}
-          className={classToString(
-            "border-b-2 w-full py-2 flex justify-center items-center cursor-pointer",
-            method === "email"
-              ? "text-orange-400 font-semibold border-orange-400"
-              : "text-black"
-          )}
-        >
-          Email Address
+      {tokenObj.ok ? (
+        <div className="flex justify-around w-full py-10">
+          <TokenForm />
         </div>
-        <div
-          onClick={setPhone}
-          className={classToString(
-            "border-b-2 w-full py-2 flex justify-center items-center cursor-pointer",
-            method === "phone"
-              ? "text-orange-400 font-semibold border-orange-400"
-              : "text-black"
-          )}
-        >
-          Phone Number
-        </div>
-      </div>
-      <div className="flex flex-col w-full px-3 mb-5">
-        <div className="w-full py-5">
-          <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-            {method === "email" && (
-              <div>
-                <Input
-                  label="Email Address"
-                  type="email"
-                  name="email"
-                  required
-                  placeholder="Email Address"
-                  register={register("email")}
-                />
-              </div>
-            )}
-            {method === "phone" && (
-              <>
-                <label className="py-2 text-sm font-semibold">
-                  Phone Number
-                </label>
-                <div className="flex">
-                  <div className="flex justify-center items-center bg-gray-200 text-gray-400 px-2 rounded-l-lg">
-                    +82
+      ) : (
+        <>
+          <div className="flex justify-around w-full">
+            <div
+              onClick={setEmail}
+              className={classToString(
+                "border-b-2 w-full py-2 flex justify-center items-center cursor-pointer",
+                method === "email"
+                  ? "text-orange-400 font-semibold border-orange-400"
+                  : "text-black"
+              )}
+            >
+              Email Address
+            </div>
+            <div
+              onClick={setPhone}
+              className={classToString(
+                "border-b-2 w-full py-2 flex justify-center items-center cursor-pointer",
+                method === "phone"
+                  ? "text-orange-400 font-semibold border-orange-400"
+                  : "text-black"
+              )}
+            >
+              Phone Number
+            </div>
+          </div>
+          <div className="flex flex-col w-full px-3 mb-5">
+            <div className="w-full py-5">
+              <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
+                {method === "email" && (
+                  <div>
+                    <Input
+                      label="Email Address"
+                      type="email"
+                      name="email"
+                      required
+                      placeholder="Email Address"
+                      register={register("email")}
+                    />
                   </div>
-                  <Input
-                    label="Phone Number"
-                    type="number"
-                    name="phone"
-                    required
-                    placeholder="Phone Number"
-                    register={register("phone")}
-                  />
-                </div>
-              </>
-            )}
-            <SubmitButton
-              payload={
-                isLoading
-                  ? "loading..."
-                  : method === "email"
-                  ? "Get Email Link"
-                  : "Get One-time Password"
-              }
-            />
-          </form>
-        </div>
-      </div>
+                )}
+                {method === "phone" && (
+                  <>
+                    <label className="py-2 text-sm font-semibold">
+                      Phone Number
+                    </label>
+                    <div className="flex">
+                      <div className="flex justify-center items-center bg-gray-200 text-gray-400 px-2 rounded-l-lg">
+                        +82
+                      </div>
+                      <Input
+                        label="Phone Number"
+                        type="number"
+                        name="phone"
+                        required
+                        placeholder="Phone Number"
+                        register={register("phone")}
+                      />
+                    </div>
+                  </>
+                )}
+                <SubmitButton
+                  payload={
+                    isLoading
+                      ? "loading..."
+                      : method === "email"
+                      ? "Get Email Link"
+                      : "Get One-time Password"
+                  }
+                />
+              </form>
+            </div>
+          </div>{" "}
+        </>
+      )}
       <div className="flex relative w-full justify-center font-semibold px-2 mb-5">
         <div className=" bg-white z-10 text-gray-400 px-2">Or Enter With</div>
         <div className="absolute top-3 h-[1.2px] bg-gray-300 w-full"></div>
