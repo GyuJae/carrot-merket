@@ -1,5 +1,5 @@
 import TokenForm from "@components/TokenForm";
-import { enterFetch } from "@libs/client/apis/enter";
+import { enterFetch } from "@libs/client/apis/enterFetch";
 import { classToString } from "@libs/client/utils";
 import { Token } from "@prisma/client";
 import type { NextPage } from "next";
@@ -57,7 +57,7 @@ const Enter: NextPage = () => {
       </div>
       {tokenObj.ok ? (
         <div className="flex justify-around w-full py-10">
-          <TokenForm />
+          <TokenForm tokenObj={tokenObj} />
         </div>
       ) : (
         <>

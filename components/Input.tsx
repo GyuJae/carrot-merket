@@ -8,6 +8,7 @@ interface IInput {
   required: boolean;
   placeholder: string;
   register: UseFormRegisterReturn;
+  [key: string]: any;
 }
 
 const Input: React.FC<IInput> = ({
@@ -17,6 +18,7 @@ const Input: React.FC<IInput> = ({
   required = false,
   placeholder,
   register,
+  ...rest
 }) => {
   return (
     <div className="w-full flex flex-col">
@@ -35,6 +37,7 @@ const Input: React.FC<IInput> = ({
           "appearance-none px-3 py-3 rounded-md shadow-sm border-gray-300 placeholder-gray-400 focus:border-orange-400  focus:ring-orange-400",
           name === "phone" ? "rounded-l-none" : ""
         )}
+        {...rest}
       />
     </div>
   );
