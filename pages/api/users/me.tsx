@@ -4,7 +4,7 @@ import { withApiSession } from "@libs/server/withSession";
 import { User } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
-interface IMeResponse extends IResponse {
+export interface IMeResponse extends IResponse {
   user?: User | null;
 }
 
@@ -35,4 +35,4 @@ const handler = async (
   }
 };
 
-export default withApiSession(withHandler("GET", handler));
+export default withApiSession(withHandler({ method: "GET", handler }));

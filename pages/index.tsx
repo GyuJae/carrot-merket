@@ -1,8 +1,10 @@
+import useUser from "@libs/client/hooks/useUser";
 import type { NextPage } from "next";
 import Item from "../components/Item";
 import Layout from "../components/layout";
 
 const Home: NextPage = () => {
+  const user = useUser();
   return (
     <Layout title="홈" hasTabBar>
       <div className="flex flex-col space-y-2 ">
