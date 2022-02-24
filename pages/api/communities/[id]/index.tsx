@@ -10,7 +10,7 @@ interface IAnswers extends Answer {
 
 interface PostDetail extends Post {
   user: User;
-  amswers?: IAnswers[];
+  answers: IAnswers[];
   _count: {
     answers: number;
     wonderings: number;

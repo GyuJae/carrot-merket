@@ -1,8 +1,16 @@
+import SubmitButton from "@components/submit-button";
+import Textarea from "@components/Textarea";
 import { classToString } from "@libs/client/utils";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
+import {
+  answerPostFetch,
+  IAnswerForm,
+  IPostAnswerResponse,
+} from "pages/api/communities/[id]/answer";
 import { IPostDetailResponse } from "pages/api/communities/[id]/index";
 import { toggleWonderFetch } from "pages/api/communities/[id]/wonder";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import useSWR from "swr";
 import Layout from "../../components/layout";
@@ -14,15 +22,43 @@ const CommunityPostDetail: NextPage = () => {
     router.query.id ? `/api/communities/${router.query.id}` : null
   );
 
-  const { mutate: toggleWondering } = useMutation(
+  const { mutate: toggleWondering, isLoading } = useMutation(
     () => toggleWonderFetch(router.query.id + ""),
     {
       onSuccess: () => {},
     }
   );
+  const { mutate: answerMutate, isLoading: isAnswerLoading } = useMutation(
+    (data: IAnswerForm) => answerPostFetch(data, router.query.id + ""),
+    {
+      onSuccess: (success: IPostAnswerResponse) => {
+        if (
+          success.ok &&
+          data &&
+          data.post &&
+          data.post.answers &&
+          success.answer
+        ) {
+          mutateSWR(
+            {
+              ...data,
+              post: {
+                ...data.post,
+                answers: [...data.post.answers, success.answer],
+                _count: {
+                  ...data.post._count,
+                  answers: data.post._count.answers + 1,
+                },
+              },
+            },
+            false
+          );
+        }
+      },
+    }
+  );
 
   const onClickWondering = () => {
-    toggleWondering();
     if (!data || !data.post) return;
     mutateSWR(
       {
@@ -40,11 +76,21 @@ const CommunityPostDetail: NextPage = () => {
       },
       false
     );
+    if (!isLoading) {
+      toggleWondering();
+    }
+  };
+
+  const { register, handleSubmit, reset } = useForm<IAnswerForm>();
+
+  const onAnswerSubmit: SubmitHandler<IAnswerForm> = (data) => {
+    reset();
+    answerMutate(data);
   };
 
   return (
     <Layout title="Community" canGoBack>
-      <div className="py-4">
+      <div className="py-4 ">
         <div className="text-sm m-2 mb-4 bg-gray-300 w-max rounded-md p-[1.9px] font-semibold ">
           동네질문
         </div>
@@ -68,7 +114,7 @@ const CommunityPostDetail: NextPage = () => {
             <span
               className={classToString(
                 "flex space-x-2 items-center text-sm",
-                data?.isWondering ? "text-green-500 font-semibold" : ""
+                data?.isWondering ? "text-teal-500 font-semibold" : ""
               )}
             >
               <svg
@@ -108,12 +154,25 @@ const CommunityPostDetail: NextPage = () => {
             </span>
           </div>
         </div>
-        <div className="px-4 my-5 space-y-5">
-          {data?.post?.amswers?.map((answer) => (
-            <div key={answer.id} className="flex items-start space-x-3">
-              <div className="w-8 h-8 bg-slate-200 rounded-full" />
+        <form onSubmit={handleSubmit(onAnswerSubmit)} className="px-4">
+          <Textarea
+            name="answer"
+            rows={2}
+            required
+            placeholder="Answer this question!"
+            register={register("answer", { required: true })}
+          />
+          <SubmitButton payload={isAnswerLoading ? "loading..." : "Reply"} />
+        </form>
+        <div className="px-4 mt-3 space-y-5 ">
+          {data?.post?.answers?.map((answer) => (
+            <div
+              key={answer.id}
+              className="flex items-start space-x-3 py-2 border-b-[1.1px] last:border-b-0 "
+            >
+              <div className="w-8 h-8 bg-slate-200 rounded-full mt-2 ml-1" />
               <div>
-                <span className="text-sm block font-medium text-gray-700">
+                <span className="text-sm block font-semibold text-gray-700">
                   {answer.user.name}
                 </span>
                 <span className="text-xs text-gray-500 block ">
@@ -123,16 +182,6 @@ const CommunityPostDetail: NextPage = () => {
               </div>
             </div>
           ))}
-        </div>
-        <div className="px-4">
-          <textarea
-            className="mt-1 shadow-sm w-full focus:ring-orange-500 rounded-md border-gray-300 focus:border-orange-500 "
-            rows={4}
-            placeholder="Answer this question!"
-          />
-          <button className="mt-4 bg-orange-400 w-full text-white rounded-sm py-1 ring-2 ring-offset-1 ring-orange-400 hover:bg-orange-500 active:bg-orange-300">
-            Reply
-          </button>
         </div>
       </div>
     </Layout>
