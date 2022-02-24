@@ -1,17 +1,37 @@
-import client from "@libs/server/client";
 import withHandler, { IResponse } from "@libs/server/withHandler";
 import { Token } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
+import prisma from "@libs/server/client";
 
 export interface IEnterResponse extends IResponse {
   token?: Token | null;
 }
+
+export interface IEnterForm {
+  email?: string;
+  phone?: number;
+}
+
+export const enterFetch = (data: IEnterForm) =>
+  fetch("/api/users/enter", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }).then((res) => res.json());
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<IEnterResponse>
 ) {
   try {
+    if (!prisma) {
+      return {
+        ok: false,
+        error: "Prisma null",
+      };
+    }
     const { email, phone } = req.body;
     const payload = Date.now() + Math.ceil(Math.random() * 999999) + "";
     const userPayload = phone ? { phone: +phone } : email ? { email } : null;
@@ -21,7 +41,7 @@ async function handler(
         error: "Form Error",
       });
 
-    const token = await client.token.create({
+    const token = await prisma.token.create({
       data: {
         payload,
         user: {
@@ -49,4 +69,4 @@ async function handler(
   }
 }
 
-export default withHandler({ method: "POST", handler, isPrivate: false });
+export default withHandler({ methods: ["POST"], handler, isPrivate: false });

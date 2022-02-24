@@ -1,15 +1,11 @@
-import { tokenVerifyFetch } from "@libs/client/apis/tokenVerifyFetch";
 import { IResponse } from "@libs/server/withHandler";
 import { Token } from "@prisma/client";
 import { useRouter } from "next/router";
+import { IEnterTokenForm, tokenVerifyFetch } from "pages/api/users/tokenVerify";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import Input from "./Input";
 import SubmitButton from "./submit-button";
-
-interface ITokenForm {
-  payload: string;
-}
 
 interface IComponentTokenForm {
   tokenObj: {
@@ -19,10 +15,10 @@ interface IComponentTokenForm {
 }
 
 const TokenForm: React.FC<IComponentTokenForm> = ({ tokenObj }) => {
-  const { register, handleSubmit } = useForm<ITokenForm>();
+  const { register, handleSubmit } = useForm<IEnterTokenForm>();
   const router = useRouter();
   const { mutate, isLoading } = useMutation(
-    (data: ITokenForm) => tokenVerifyFetch(data),
+    (data: IEnterTokenForm) => tokenVerifyFetch(data),
     {
       onSuccess: ({ ok }: IResponse) => {
         if (ok) {
@@ -31,7 +27,7 @@ const TokenForm: React.FC<IComponentTokenForm> = ({ tokenObj }) => {
       },
     }
   );
-  const onSubmit: SubmitHandler<ITokenForm> = (data) => {
+  const onSubmit: SubmitHandler<IEnterTokenForm> = (data) => {
     mutate(data);
   };
 

@@ -1,17 +1,24 @@
-const Item = () => {
+import { Product } from "@prisma/client";
+import { useRouter } from "next/router";
+
+const Product: React.FC<{ product: Product }> = ({ product }) => {
+  const router = useRouter();
   return (
-    <div className="flex justify-between border-b-[1.5px] ">
+    <div
+      className="flex justify-between border-b-[1.5px]"
+      onClick={() => router.push(`product/${product.id}`)}
+    >
       <div className="flex w-full justify-between cursor-pointer">
         <div className="flex  py-2 px-1 space-x-3">
           <div className="w-20 h-20 bg-slate-500 rounded-md"></div>
-          <div className="flex flex-col py-1">
-            <div className="text-sm font-semibold">title</div>
-            <div className="text-xs text-gray-400">location</div>
-            <div className="text-sm font-bold">price</div>
+          <div className="flex flex-col py-1 space-y-1">
+            <div className="text-sm font-semibold">{product.name}</div>
+            {/* <div className="text-xs text-gray-400">{product.location}</div> */}
+            <div className="text-xs font-bold">${product.price}</div>
           </div>
         </div>
         <div className=" flex items-end space-x-2 px-2 py-2">
-          <div className="flex justify-center items-center text-gray-500 text-sm space-x-1">
+          <div className="flex justify-center items-center text-gray-500 text-sm space-x-1 ">
             <svg
               className="w-4 h-4"
               fill="none"
@@ -51,4 +58,4 @@ const Item = () => {
   );
 };
 
-export default Item;
+export default Product;

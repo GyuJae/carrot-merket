@@ -1,10 +1,38 @@
 import type { NextPage } from "next";
+import { useRouter } from "next/router";
+import {
+  IUploadProductForm,
+  IUploadProductResponse,
+  uploadProductFetch,
+} from "pages/api/products/upload";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { useMutation } from "react-query";
 import Input from "../../components/Input";
 import Layout from "../../components/layout";
 import SubmitButton from "../../components/submit-button";
 import Textarea from "../../components/Textarea";
 
-const upload: NextPage = () => {
+const Upload: NextPage = () => {
+  const { register, handleSubmit } = useForm<IUploadProductForm>();
+  const router = useRouter();
+  const { mutate, isLoading } = useMutation(
+    (data: IUploadProductForm) => uploadProductFetch(data),
+    {
+      onSuccess: (data: IUploadProductResponse) => {
+        if (data.ok) {
+          router.push(`/product/${data.productId}`);
+        }
+        console.log(data);
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    }
+  );
+
+  const onSubmit: SubmitHandler<IUploadProductForm> = (data) => {
+    mutate(data);
+  };
   return (
     <Layout title="Upload Product" canGoBack>
       <div className="py-4 px-4">
@@ -29,13 +57,25 @@ const upload: NextPage = () => {
           </label>
         </div>
         <div>
-          <form className="flex flex-col space-y-2">
-            <Input type="text" label="title" placeholder="Title" name="Title" />
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col space-y-2"
+          >
+            <Input
+              type="text"
+              label="name"
+              placeholder="Name"
+              name="name"
+              register={register("name")}
+              required
+            />
             <Input
               type="number"
               label="price"
               placeholder="$ Price"
               name="price"
+              register={register("price")}
+              required
             />
 
             <Textarea
@@ -43,9 +83,12 @@ const upload: NextPage = () => {
               rows={5}
               required
               placeholder="Description"
+              register={register("description")}
             />
 
-            <SubmitButton payload="Upload Product" />
+            <SubmitButton
+              payload={isLoading ? "loading..." : "Upload Product"}
+            />
           </form>
         </div>
       </div>
@@ -53,4 +96,4 @@ const upload: NextPage = () => {
   );
 };
 
-export default upload;
+export default Upload;

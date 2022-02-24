@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import { useRouter } from "next/router";
 import { IMeResponse } from "pages/api/users/me";
 import { useEffect, useState } from "react";

@@ -1,14 +1,20 @@
-import useUser from "@libs/client/hooks/useUser";
 import type { NextPage } from "next";
-import Item from "../components/Item";
+import Product from "../components/Product";
 import Layout from "../components/layout";
+import useSWR from "swr";
+import { IProductsResponse } from "./api/products";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
-  const user = useUser();
+  const { data } = useSWR<IProductsResponse>("/api/products");
+  const router = useRouter();
   return (
     <Layout title="홈" hasTabBar>
       <div className="flex flex-col space-y-2 ">
-        <button className="fixed bottom-24 right-3 bg-orange-400 hover:bg-orange-500 active:bg-orange-300 transition-colors p-2 rounded-full text-white">
+        <button
+          onClick={() => router.push("/product/upload")}
+          className="fixed bottom-24 right-7 bg-orange-400 hover:bg-orange-500 active:bg-orange-300 transition-colors p-2 rounded-full text-white"
+        >
           <svg
             className="h-6 w-6"
             xmlns="http://www.w3.org/2000/svg"
@@ -25,11 +31,9 @@ const Home: NextPage = () => {
             />
           </svg>
         </button>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17].map(
-          (i) => (
-            <Item key={i} />
-          )
-        )}
+        {data?.products?.map((product) => (
+          <Product key={product.id} product={product} />
+        ))}
       </div>
     </Layout>
   );

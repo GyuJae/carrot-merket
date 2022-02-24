@@ -1,5 +1,4 @@
 import TokenForm from "@components/TokenForm";
-import { enterFetch } from "@libs/client/apis/enterFetch";
 import { classToString } from "@libs/client/utils";
 import { Token } from "@prisma/client";
 import type { NextPage } from "next";
@@ -8,12 +7,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import Input from "../components/Input";
 import SubmitButton from "../components/submit-button";
-import { IEnterResponse } from "./api/users/enter";
-
-interface IEnterForm {
-  email?: string;
-  phone?: number;
-}
+import { enterFetch, IEnterForm, IEnterResponse } from "./api/users/enter";
 
 const Enter: NextPage = () => {
   const [tokenObj, setTokenObj] = useState<{
