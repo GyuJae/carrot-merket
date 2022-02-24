@@ -4,8 +4,16 @@ import { Product, User } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@libs/server/client";
 
+interface ICount {
+  favs: number;
+}
+
+export interface IProductWithCount extends Product {
+  _count: ICount;
+}
+
 export interface IProductsResponse extends IResponse {
-  products?: Product[] | null;
+  products?: IProductWithCount[] | null;
 }
 
 const handler = async (
@@ -20,7 +28,11 @@ const handler = async (
       };
     }
 
-    const products = await prisma.product.findMany({});
+    const products = await prisma.product.findMany({
+      include: {
+        _count: true,
+      },
+    });
     return res.json({
       ok: true,
       products,

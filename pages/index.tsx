@@ -32,7 +32,9 @@ const Home: NextPage = () => {
           </svg>
         </button>
         {data?.products?.map((product) => (
-          <Product key={product.id} product={product} />
+          <div key={product.id} className="border-b-[1.5px] last:border-b-0">
+            <Product product={product} />
+          </div>
         ))}
       </div>
     </Layout>

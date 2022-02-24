@@ -1,11 +1,12 @@
 import { Product } from "@prisma/client";
 import { useRouter } from "next/router";
+import { IProductWithCount } from "pages/api/products";
 
-const Product: React.FC<{ product: Product }> = ({ product }) => {
+const Product: React.FC<{ product: IProductWithCount }> = ({ product }) => {
   const router = useRouter();
   return (
     <div
-      className="flex justify-between border-b-[1.5px]"
+      className="flex justify-between"
       onClick={() => router.push(`product/${product.id}`)}
     >
       <div className="flex w-full justify-between cursor-pointer">
@@ -33,7 +34,7 @@ const Product: React.FC<{ product: Product }> = ({ product }) => {
                 d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
               ></path>
             </svg>
-            <span>1</span>
+            <span>{product._count.favs}</span>
           </div>
           <div className="flex justify-center items-center text-gray-500 text-sm space-x-1">
             <svg

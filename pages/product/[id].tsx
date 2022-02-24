@@ -10,7 +10,7 @@ import Layout from "../../components/layout";
 
 const ItemDetail: NextPage = () => {
   const router = useRouter();
-  const { data } = useSWR<IProductDetailResponse>(
+  const { data, mutate: swrMutate } = useSWR<IProductDetailResponse>(
     router.query.id ? `/api/products/${router.query.id}` : null
   );
 
@@ -22,6 +22,8 @@ const ItemDetail: NextPage = () => {
   );
 
   const onClickFav = () => {
+    if (!data) return;
+    swrMutate({ ...data, isLiked: !data.isLiked }, false);
     toggleFav();
   };
 
@@ -44,12 +46,10 @@ const ItemDetail: NextPage = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col py-2 border-b-2">
+          <div className="flex flex-col py-2 border-b-2 space-y-1">
             <h1 className="text-xl font-bold">{data?.product?.name}</h1>
-            <h2 className="text-lg font-semibold">${data?.product?.price}</h2>
-            <p className="text-sm text-justify py-1">
-              {data?.product?.description}
-            </p>
+            <h2 className="text-base font-semibold">${data?.product?.price}</h2>
+            <p className="text-sm text-justify">{data?.product?.description}</p>
           </div>
           <div className="bg-white flex items-center py-4 px-1 w-full max-w-xl">
             <button className="bg-orange-400 w-full text-white rounded-sm py-1 ring-2 ring-offset-1 ring-orange-400 hover:bg-orange-500 active:bg-orange-300">
