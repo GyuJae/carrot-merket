@@ -22,10 +22,6 @@ const Upload: NextPage = () => {
         if (data.ok) {
           router.push(`/product/${data.productId}`);
         }
-        console.log(data);
-      },
-      onError: (error) => {
-        console.log(error);
       },
     }
   );

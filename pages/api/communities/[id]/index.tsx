@@ -1,21 +1,30 @@
 import withHandler, { IResponse } from "@libs/server/withHandler";
 import { withApiSession } from "@libs/server/withSession";
+import { Answer, Post, User } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@libs/server/client";
 
-export interface IProductFavResponse extends IResponse {}
+interface IAnswers extends Answer {
+  user: User;
+}
 
-export const favToggleFetch = (id: string) =>
-  fetch(`/api/products/${id}/fav`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).then((res) => res.json());
+interface PostDetail extends Post {
+  user: User;
+  amswers?: IAnswers[];
+  _count: {
+    answers: number;
+    wonderings: number;
+  };
+}
+
+export interface IPostDetailResponse extends IResponse {
+  post?: PostDetail | null;
+  isWondering?: boolean | null;
+}
 
 const handler = async (
   req: NextApiRequest,
-  res: NextApiResponse<IProductFavResponse>
+  res: NextApiResponse<IPostDetailResponse>
 ) => {
   try {
     if (!prisma) {
@@ -24,6 +33,7 @@ const handler = async (
         error: "Prisma null",
       };
     }
+
     const {
       query: { id },
       session: { user },
@@ -31,47 +41,43 @@ const handler = async (
     if (!user) {
       return {
         ok: false,
-        error: "No authorization.",
+        error: "No Authorization.",
       };
     }
-    const existProduct = await prisma.product.findUnique({
+
+    const post = await prisma.post.findUnique({
       where: {
         id: +id.toString(),
       },
-      select: {
-        id: true,
+      include: {
+        user: true,
+        _count: true,
+        answers: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
-    if (!existProduct) {
+
+    if (!post) {
       return res.json({
         ok: false,
-        error: "This product id does not exist.",
+        error: "This post Id does not exist.",
       });
     }
-    const existFav = await prisma.fav.findUnique({
+    const wondering = await prisma.wondering.findUnique({
       where: {
-        userId_productId: {
+        userId_postId: {
           userId: user.id,
-          productId: existProduct.id,
+          postId: post.id,
         },
       },
     });
-    if (existFav) {
-      await prisma.fav.delete({
-        where: {
-          id: existFav.id,
-        },
-      });
-    } else {
-      await prisma.fav.create({
-        data: {
-          userId: user.id,
-          productId: existProduct.id,
-        },
-      });
-    }
     return res.json({
       ok: true,
+      post,
+      isWondering: wondering ? true : false,
     });
   } catch (error) {
     return res.json({

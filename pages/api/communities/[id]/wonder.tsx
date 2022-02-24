@@ -1,12 +1,13 @@
 import withHandler, { IResponse } from "@libs/server/withHandler";
 import { withApiSession } from "@libs/server/withSession";
+import { Product, User } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@libs/server/client";
 
-export interface IProductFavResponse extends IResponse {}
+export interface IToggleWonderResponse extends IResponse {}
 
-export const favToggleFetch = (id: string) =>
-  fetch(`/api/products/${id}/fav`, {
+export const toggleWonderFetch = (id: string) =>
+  fetch(`/api/communities/${id}/wonder`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -15,7 +16,7 @@ export const favToggleFetch = (id: string) =>
 
 const handler = async (
   req: NextApiRequest,
-  res: NextApiResponse<IProductFavResponse>
+  res: NextApiResponse<IToggleWonderResponse>
 ) => {
   try {
     if (!prisma) {
@@ -34,7 +35,7 @@ const handler = async (
         error: "No authorization.",
       };
     }
-    const existProduct = await prisma.product.findUnique({
+    const post = await prisma.post.findUnique({
       where: {
         id: +id.toString(),
       },
@@ -42,31 +43,31 @@ const handler = async (
         id: true,
       },
     });
-    if (!existProduct) {
+    if (!post) {
       return res.json({
         ok: false,
-        error: "This product id does not exist.",
+        error: "This post id does not exist.",
       });
     }
-    const existFav = await prisma.fav.findUnique({
+    const existWondering = await prisma.wondering.findUnique({
       where: {
-        userId_productId: {
+        userId_postId: {
           userId: user.id,
-          productId: existProduct.id,
+          postId: post.id,
         },
       },
     });
-    if (existFav) {
-      await prisma.fav.delete({
+    if (existWondering) {
+      await prisma.wondering.delete({
         where: {
-          id: existFav.id,
+          id: existWondering.id,
         },
       });
     } else {
-      await prisma.fav.create({
+      await prisma.wondering.create({
         data: {
           userId: user.id,
-          productId: existProduct.id,
+          postId: post.id,
         },
       });
     }
@@ -81,4 +82,4 @@ const handler = async (
   }
 };
 
-export default withApiSession(withHandler({ methods: ["GET"], handler }));
+export default withApiSession(withHandler({ methods: ["POST"], handler }));
