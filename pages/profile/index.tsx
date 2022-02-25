@@ -1,22 +1,36 @@
+import useUser from "@libs/client/hooks/useUser";
 import { NextPage } from "next";
+import { useRouter } from "next/router";
+import useSWR from "swr";
 import Layout from "../../components/layout";
+import { IReviewsResponse } from "pages/api/reviews/index";
+import { classToString } from "@libs/client/utils";
 
 const Profile: NextPage = () => {
+  const { user } = useUser();
+  const router = useRouter();
+  const { data } = useSWR<IReviewsResponse>("/api/reviews");
   return (
     <Layout title="나의 캐럿" hasTabBar>
       <div className="px-4 py-4">
         <div className="flex items-center">
           <div className="w-16 h-16 bg-gray-500 rounded-full" />
           <div className="flex flex-col ml-3">
-            <span className="font-semibold text-sm">Steve Jebs</span>
-            <span className="text-gray-500 text-xs cursor-pointer hover:underline active:text-gray-300">
+            <span className="font-semibold text-sm">{user?.name}</span>
+            <span
+              className="text-gray-500 text-xs cursor-pointer hover:underline active:text-gray-300"
+              onClick={() => router.push("/profile/edit")}
+            >
               Edit profile &rarr;
             </span>
           </div>
         </div>
         <div className="flex justify-around py-10">
           <div className="flex flex-col items-center">
-            <div className="mb-1 bg-orange-400 p-4 rounded-full text-white cursor-pointer hover:bg-orange-500 active:bg-orange-300">
+            <div
+              onClick={() => router.push("/profile/sold")}
+              className="mb-1 bg-orange-400 p-4 rounded-full text-white cursor-pointer hover:bg-orange-500 active:bg-orange-300"
+            >
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -35,7 +49,10 @@ const Profile: NextPage = () => {
             <span className="text-sm">판매내역</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="mb-1 bg-orange-400 p-4 rounded-full text-white cursor-pointer hover:bg-orange-500 active:bg-orange-300">
+            <div
+              onClick={() => router.push("/profile/bought")}
+              className="mb-1 bg-orange-400 p-4 rounded-full text-white cursor-pointer hover:bg-orange-500 active:bg-orange-300"
+            >
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -54,7 +71,10 @@ const Profile: NextPage = () => {
             <span className="text-sm">구매내역</span>
           </div>
           <div className="flex flex-col items-center">
-            <div className="mb-1 bg-orange-400 p-4 rounded-full text-white cursor-pointer hover:bg-orange-500 active:bg-orange-300">
+            <div
+              onClick={() => router.push("/profile/loved")}
+              className="mb-1 bg-orange-400 p-4 rounded-full text-white cursor-pointer hover:bg-orange-500 active:bg-orange-300"
+            >
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -74,69 +94,36 @@ const Profile: NextPage = () => {
           </div>
         </div>
         <div>
-          <div className="flex items-center">
-            <div className="w-12 h-12 bg-gray-500 rounded-full" />
-            <div className="flex flex-col ml-3">
-              <h4 className="text-sm font-semibold">니꼬</h4>
-              <div className="flex ">
-                <svg
-                  className="text-yellow-400 h-5 w-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg
-                  className="text-yellow-400 h-5 w-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg
-                  className="text-yellow-400 h-5 w-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg
-                  className="text-yellow-400 h-5 w-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <svg
-                  className="text-gray-400 h-5 w-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
+          {data?.reviews?.map((review) => (
+            <div key={review.id} className="flex items-center">
+              <div className="w-16 h-16 bg-gray-500 rounded-full" />
+              <div className="flex flex-col ml-3">
+                <h4 className="text-sm font-semibold">{review.writer.name}</h4>
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((item) => (
+                    <svg
+                      key={item}
+                      className={classToString(
+                        "h-5 w-5",
+                        review.score >= item
+                          ? "text-yellow-400"
+                          : "text-gray-400"
+                      )}
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+                <div className="px-1 mt-2">
+                  <p className="text-sm">{review.review}</p>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="px-2 mt-2">
-            <p className="text-sm">
-              Normally, both your asses would be dead as fucking fried chicken,
-              but you happen to pull this shit while I&apos;m in a transitional
-              period so I don&apos;t wanna kill you, I wanna help you. But I
-              can&apos;t give you this case, it don&apos;t belong to me.
-              Besides, I&apos;ve already been through too much shit this morning
-              over this case to hand it over to your dumb ass.
-            </p>
-          </div>
+          ))}
         </div>
       </div>
     </Layout>

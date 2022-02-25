@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import { IMeResponse } from "pages/api/users/me";
-import { useEffect, useState } from "react";
+import { IMeResponse } from "pages/api/users/me/index";
+import { useEffect } from "react";
 import useSWR from "swr";
 
 export default function useUser() {
