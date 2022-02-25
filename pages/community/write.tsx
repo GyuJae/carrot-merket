@@ -1,6 +1,8 @@
+import useCoords from "@libs/client/hooks/useCoords";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import {
+  IFetchPostWrite,
   IWriteForm,
   IWriteFormResponse,
   writePostFetch,
@@ -12,17 +14,22 @@ import SubmitButton from "../../components/submit-button";
 import Textarea from "../../components/Textarea";
 
 const Write: NextPage = () => {
+  const { latitude, longitude } = useCoords();
   const { register, handleSubmit } = useForm<IWriteForm>();
   const router = useRouter();
-  const { mutate } = useMutation((data: IWriteForm) => writePostFetch(data), {
-    onSuccess: (data: IWriteFormResponse) => {
-      if (data.ok) {
-        router.replace(`/community/${data.postId}`);
-      }
-    },
-  });
+
+  const { mutate } = useMutation(
+    (data: IFetchPostWrite) => writePostFetch(data),
+    {
+      onSuccess: (data: IWriteFormResponse) => {
+        if (data.ok) {
+          router.replace(`/community/${data.postId}`);
+        }
+      },
+    }
+  );
   const onSubmit: SubmitHandler<IWriteForm> = (data) => {
-    mutate(data);
+    mutate({ ...data, latitude, longitude });
   };
   return (
     <Layout title="Community Write" canGoBack>

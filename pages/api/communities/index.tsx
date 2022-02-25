@@ -27,11 +27,25 @@ const handler = async (
         error: "Prisma null",
       };
     }
-
+    const {
+      query: { latitude, longitude },
+    } = req;
+    const parsedLatitude = parseFloat(latitude.toString());
+    const parsedLognitude = parseFloat(longitude.toString());
     const posts = await prisma.post.findMany({
       include: {
         _count: true,
         user: true,
+      },
+      where: {
+        latitude: {
+          gte: parsedLatitude - 0.01,
+          lte: parsedLatitude + 0.01,
+        },
+        longitude: {
+          gte: parsedLognitude - 0.01,
+          lte: parsedLognitude + 0.01,
+        },
       },
     });
 

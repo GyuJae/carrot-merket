@@ -11,7 +11,12 @@ export interface IWriteForm {
   question: string;
 }
 
-export const writePostFetch = (data: IWriteForm) =>
+export interface IFetchPostWrite extends IWriteForm {
+  latitude?: number | null;
+  longitude?: number | null;
+}
+
+export const writePostFetch = (data: IFetchPostWrite) =>
   fetch("/api/communities/write", {
     method: "POST",
     body: JSON.stringify(data),
@@ -33,7 +38,7 @@ async function handler(
     }
     const {
       session: { user },
-      body: { question },
+      body: { question, latitude, longitude },
     } = req;
     if (!user) {
       return res.status(401).json({
@@ -45,6 +50,8 @@ async function handler(
       data: {
         userId: user.id,
         question,
+        latitude,
+        longitude,
       },
       select: {
         id: true,

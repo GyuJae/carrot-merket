@@ -1,3 +1,4 @@
+import useCoords from "@libs/client/hooks/useCoords";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { IPostsResponse } from "pages/api/communities/index";
@@ -6,7 +7,12 @@ import Layout from "../../components/layout";
 
 const Communtiy: NextPage = () => {
   const router = useRouter();
-  const { data } = useSWR<IPostsResponse>("/api/communities");
+  const { latitude, longitude } = useCoords();
+  const { data } = useSWR<IPostsResponse>(
+    latitude && longitude
+      ? `/api/communities?latitude=${latitude}&longitude=${longitude}`
+      : null
+  );
   return (
     <Layout title="동네생활" hasTabBar>
       <div className="px-4 py-4">
@@ -70,7 +76,7 @@ const Communtiy: NextPage = () => {
           ))}
           <button
             onClick={() => router.push("community/write")}
-            className="fixed bottom-24 right-3 bg-orange-400 hover:bg-orange-500 active:bg-orange-300 transition-colors p-2 rounded-full text-white"
+            className="fixed bottom-24 right-7 bg-orange-400 hover:bg-orange-500 active:bg-orange-300 transition-colors p-2 rounded-full text-white"
           >
             <svg
               className="w-6 h-6"
