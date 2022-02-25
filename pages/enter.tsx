@@ -105,7 +105,7 @@ const Enter: NextPage = () => {
                       </div>
                       <Input
                         label="Phone Number"
-                        type="number"
+                        type="text"
                         name="phone"
                         required
                         placeholder="Phone Number"
@@ -115,10 +115,9 @@ const Enter: NextPage = () => {
                   </>
                 )}
                 <SubmitButton
+                  isLoading={isLoading}
                   payload={
-                    isLoading
-                      ? "loading..."
-                      : method === "email"
+                    method === "email"
                       ? "Get Email Link"
                       : "Get One-time Password"
                   }

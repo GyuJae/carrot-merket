@@ -18,7 +18,6 @@ interface IProductListResponse extends IResponse {
 
 const ProductList: React.FC<IProductList> = ({ kind }) => {
   const { data } = useSWR<IProductListResponse>(`/api/users/me/${kind}`);
-  console.log(data);
   return (
     <div className="flex flex-col space-y-2 py-1">
       {data?.products.map((product) => (

@@ -82,9 +82,7 @@ const Upload: NextPage = () => {
               register={register("description")}
             />
 
-            <SubmitButton
-              payload={isLoading ? "loading..." : "Upload Product"}
-            />
+            <SubmitButton isLoading={isLoading} payload={"Upload Product"} />
           </form>
         </div>
       </div>

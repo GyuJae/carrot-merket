@@ -18,7 +18,7 @@ const Write: NextPage = () => {
   const { register, handleSubmit } = useForm<IWriteForm>();
   const router = useRouter();
 
-  const { mutate } = useMutation(
+  const { mutate, isLoading } = useMutation(
     (data: IFetchPostWrite) => writePostFetch(data),
     {
       onSuccess: (data: IWriteFormResponse) => {
@@ -41,7 +41,7 @@ const Write: NextPage = () => {
             placeholder="Ask a question!"
             register={register("question")}
           />
-          <SubmitButton payload="Submit" />
+          <SubmitButton isLoading={isLoading} payload="Submit" />
         </form>
       </div>
     </Layout>

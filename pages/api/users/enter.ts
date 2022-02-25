@@ -9,7 +9,7 @@ export interface IEnterResponse extends IResponse {
 
 export interface IEnterForm {
   email?: string;
-  phone?: number;
+  phone?: string;
 }
 
 export const enterFetch = (data: IEnterForm) =>
@@ -34,7 +34,7 @@ async function handler(
     }
     const { email, phone } = req.body;
     const payload = Date.now() + Math.ceil(Math.random() * 999999) + "";
-    const userPayload = phone ? { phone: +phone } : email ? { email } : null;
+    const userPayload = phone ? { phone } : email ? { email } : null;
     if (!userPayload)
       return res.status(400).json({
         ok: false,
