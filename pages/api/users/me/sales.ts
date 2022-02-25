@@ -1,11 +1,17 @@
 import withHandler, { IResponse } from "@libs/server/withHandler";
 import { withApiSession } from "@libs/server/withSession";
-import { Purchase } from "@prisma/client";
+import { Product, Sale } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@libs/server/client";
 
+interface IProduct extends Product {
+  _count: {
+    favs: number;
+  };
+}
+
 export interface ISalesResponse extends IResponse {
-  sales?: Purchase[] | null;
+  products?: IProduct[] | null;
 }
 
 const handler = async (
@@ -33,12 +39,20 @@ const handler = async (
         userId: user.id,
       },
       include: {
-        product: true,
+        product: {
+          include: {
+            _count: {
+              select: {
+                favs: true,
+              },
+            },
+          },
+        },
       },
     });
     return res.json({
       ok: true,
-      sales,
+      products: sales.map((sale) => sale.product),
     });
   } catch (error) {
     return res.json({

@@ -1,11 +1,17 @@
 import withHandler, { IResponse } from "@libs/server/withHandler";
 import { withApiSession } from "@libs/server/withSession";
-import { Fav } from "@prisma/client";
+import { Fav, Product } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@libs/server/client";
 
+interface IProduct extends Product {
+  _count: {
+    favs: number;
+  };
+}
+
 export interface IFavsResponse extends IResponse {
-  favs?: Fav[] | null;
+  products?: IProduct[] | null;
 }
 
 const handler = async (
@@ -28,17 +34,26 @@ const handler = async (
         error: "No Authorization.",
       });
     }
+
     const favs = await prisma.fav.findMany({
       where: {
         userId: user.id,
       },
       include: {
-        product: true,
+        product: {
+          include: {
+            _count: {
+              select: {
+                favs: true,
+              },
+            },
+          },
+        },
       },
     });
     return res.json({
       ok: true,
-      favs,
+      products: favs.map((fav) => fav.product),
     });
   } catch (error) {
     return res.json({
