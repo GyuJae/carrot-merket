@@ -1,3 +1,4 @@
+import FloatingButton from "@components/FloatingButton";
 import useCoords from "@libs/client/hooks/useCoords";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -74,10 +75,7 @@ const Communtiy: NextPage = () => {
               </div>
             </div>
           ))}
-          <button
-            onClick={() => router.push("community/write")}
-            className="fixed bottom-24 right-7 bg-orange-400 hover:bg-orange-500 active:bg-orange-300 transition-colors p-2 rounded-full text-white"
-          >
+          <FloatingButton onClick={() => router.push("community/write")}>
             <svg
               className="w-6 h-6"
               fill="none"
@@ -92,7 +90,7 @@ const Communtiy: NextPage = () => {
                 d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
               ></path>
             </svg>
-          </button>
+          </FloatingButton>
         </div>
       </div>
     </Layout>

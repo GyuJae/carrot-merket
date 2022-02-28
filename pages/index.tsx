@@ -4,6 +4,7 @@ import Layout from "../components/layout";
 import useSWR from "swr";
 import { IProductsResponse } from "./api/products";
 import { useRouter } from "next/router";
+import FloatingButton from "@components/FloatingButton";
 
 const Home: NextPage = () => {
   const { data } = useSWR<IProductsResponse>("/api/products");
@@ -11,10 +12,7 @@ const Home: NextPage = () => {
   return (
     <Layout title="홈" hasTabBar>
       <div className="flex flex-col space-y-2 ">
-        <button
-          onClick={() => router.push("/product/upload")}
-          className="fixed bottom-24 right-7 bg-orange-400 hover:bg-orange-500 active:bg-orange-300 transition-colors p-2 rounded-full text-white"
-        >
+        <FloatingButton onClick={() => router.push("/product/upload")}>
           <svg
             className="h-6 w-6"
             xmlns="http://www.w3.org/2000/svg"
@@ -30,7 +28,7 @@ const Home: NextPage = () => {
               d="M12 6v6m0 0v6m0-6h6m-6 0H6"
             />
           </svg>
-        </button>
+        </FloatingButton>
         {data?.products?.map((product) => (
           <div key={product.id} className="border-b-[1.5px] last:border-b-0">
             <Product product={product} />

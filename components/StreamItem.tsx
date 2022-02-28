@@ -1,13 +1,15 @@
+import { Stream } from "@prisma/client";
+
 interface IStreamItem {
-  title: string;
-  thumbnail: string;
+  stream: Stream;
+  [key: string]: any;
 }
 
-const StreamItem: React.FC<IStreamItem> = ({ title, thumbnail }) => {
+const StreamItem: React.FC<IStreamItem> = ({ stream, ...rest }) => {
   return (
-    <div className="py-4 cursor-pointer">
+    <div {...rest} className="py-4 cursor-pointer">
       <div className="w-full h-48 bg-gray-400 rounded-md" />
-      <div className="mt-2 px-2 hover:underline">{title}</div>
+      <div className="mt-2 px-2 hover:underline">{stream.name}</div>
     </div>
   );
 };
