@@ -1,8 +1,10 @@
 import LiveMessage from "@components/LiveMessage";
+import useUser from "@libs/client/hooks/useUser";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { IStreamDetailResponse } from "pages/api/streams/[id]";
 import {
+  IStreamMessageUploadResponse,
   IUploadMessageForm,
   uploadStreamMessageFetch,
 } from "pages/api/streams/[id]/messages/upload";
@@ -13,14 +15,20 @@ import Layout from "../../components/layout";
 
 const Stream: NextPage = () => {
   const router = useRouter();
-  const { data } = useSWR<IStreamDetailResponse>(
+  const { user } = useUser();
+  const { data, mutate } = useSWR<IStreamDetailResponse>(
     router.query.id ? `/api/streams/${router.query.id}` : null
   );
+  console.log(data);
   const { mutate: sendMessage, isLoading } = useMutation(
     (data: IUploadMessageForm) =>
-      uploadStreamMessageFetch(data, router.query.id as string),
+      uploadStreamMessageFetch(data, (router.query.id + "") as string),
     {
-      onSuccess: () => {},
+      onSuccess: (data: IStreamMessageUploadResponse) => {
+        if (data.ok) {
+          mutate();
+        }
+      },
     }
   );
   const { register, handleSubmit, reset } = useForm<IUploadMessageForm>();
@@ -45,11 +53,16 @@ const Stream: NextPage = () => {
         <div className="relative">
           <div className="font-semibold text-lg mb-2 px-1 ">Live Chats</div>
           <div className="flex flex-col px-4 overflow-y-scroll h-80 space-y-[3.5px] bg-gray-100 py-1">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <LiveMessage key={i} />
-            ))}
+            {data?.stream &&
+              data.stream.messages.map((message) => (
+                <LiveMessage
+                  key={message.id}
+                  message={message}
+                  isMe={message.userId === user?.id}
+                />
+              ))}
 
-            <div className="absoluted bottom-0 w-full px-3 py-2">
+            <div className="absoluted bottom-0 w-full py-2">
               <form onSubmit={handleSubmit(onSubmit)} className="flex w-full">
                 <input
                   {...register("message", { required: true })}

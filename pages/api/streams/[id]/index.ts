@@ -1,11 +1,15 @@
 import withHandler, { IResponse } from "@libs/server/withHandler";
 import { withApiSession } from "@libs/server/withSession";
-import { Product, Stream, User } from "@prisma/client";
+import { Message, Product, Stream, User } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@libs/server/client";
 
+interface SteamWithMessages extends Stream {
+  messages: Message[];
+}
+
 export interface IStreamDetailResponse extends IResponse {
-  stream?: Stream;
+  stream?: SteamWithMessages;
 }
 
 const handler = async (
@@ -33,6 +37,9 @@ const handler = async (
     const stream = await prisma.stream.findUnique({
       where: {
         id: +id.toString(),
+      },
+      include: {
+        messages: true,
       },
     });
     if (!stream) {
