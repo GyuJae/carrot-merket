@@ -2,13 +2,15 @@ import FloatingButton from "@components/FloatingButton";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { IStreamsResponse } from "pages/api/streams";
+import { useState } from "react";
 import useSWR from "swr";
 import Layout from "../../components/layout";
 import StreamItem from "../../components/StreamItem";
 
 const Streams: NextPage = () => {
   const router = useRouter();
-  const { data } = useSWR<IStreamsResponse>("/api/streams");
+  const [page, setPage] = useState<number>(1);
+  const { data } = useSWR<IStreamsResponse>(`/api/streams?page=${page}`);
   return (
     <Layout title="라이브" hasTabBar>
       <div className="px-4">
@@ -21,6 +23,16 @@ const Streams: NextPage = () => {
             />
           ))}
         </div>
+        {data?.totalPage && data?.totalPage > page && (
+          <div
+            onClick={() => {
+              setPage((prev) => prev + 1);
+            }}
+            className="flex justify-center items-center py-3 cursor-pointer hover:underline"
+          >
+            더 보기
+          </div>
+        )}
         <FloatingButton
           onClick={() => router.push("/streams/create")}
           className="fixed bottom-24 right-3 bg-orange-400 hover:bg-orange-500 active:bg-orange-300 transition-colors p-2 rounded-full text-white"
