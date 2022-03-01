@@ -2,6 +2,7 @@ import React from "react";
 
 import { useRouter } from "next/router";
 import { classToString } from "../libs/client/utils";
+import Head from "next/head";
 
 interface LayoutProps {
   title?: string;
@@ -23,6 +24,9 @@ export default function Layout({
 
   return (
     <div>
+      <Head>
+        <title>{title} | Carrot Market</title>
+      </Head>
       <div
         className={classToString(
           !canGoBack ? "justify-center" : "",

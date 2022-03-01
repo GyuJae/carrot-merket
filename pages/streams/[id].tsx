@@ -17,16 +17,18 @@ const Stream: NextPage = () => {
   const router = useRouter();
   const { user } = useUser();
   const { data, mutate } = useSWR<IStreamDetailResponse>(
-    router.query.id ? `/api/streams/${router.query.id}` : null
+    router.query.id ? `/api/streams/${router.query.id}` : null,
+    {
+      refreshInterval: 1000,
+    }
   );
-  console.log(data);
+
   const { mutate: sendMessage, isLoading } = useMutation(
     (data: IUploadMessageForm) =>
       uploadStreamMessageFetch(data, (router.query.id + "") as string),
     {
       onSuccess: (data: IStreamMessageUploadResponse) => {
         if (data.ok) {
-          mutate();
         }
       },
     }
@@ -35,6 +37,29 @@ const Stream: NextPage = () => {
   const onSubmit: SubmitHandler<IUploadMessageForm> = (data) => {
     if (isLoading) return;
     reset();
+    mutate(
+      (prev) =>
+        prev &&
+        ({
+          ...prev,
+          stream: {
+            ...prev.stream,
+            messages: [
+              ...(prev.stream?.messages as any),
+              {
+                id: Date.now(),
+                message: data.message,
+                userId: user?.id,
+                user: {
+                  name: user?.name,
+                  avatar: user?.avatar,
+                },
+              },
+            ],
+          },
+        } as any),
+      false
+    );
     sendMessage(data);
   };
   return (
@@ -53,30 +78,29 @@ const Stream: NextPage = () => {
         <div className="relative">
           <div className="font-semibold text-lg mb-2 px-1 ">Live Chats</div>
           <div className="flex flex-col px-4 overflow-y-scroll h-80 space-y-[3.5px] bg-gray-100 py-1">
-            {data?.stream &&
-              data.stream.messages.map((message) => (
-                <LiveMessage
-                  key={message.id}
-                  message={message}
-                  isMe={message.userId === user?.id}
-                />
-              ))}
-
-            <div className="absoluted bottom-0 w-full py-2">
-              <form onSubmit={handleSubmit(onSubmit)} className="flex w-full">
-                <input
-                  {...register("message", { required: true })}
-                  type="text"
-                  className="shadow-md w-full focus:ring-orange-500 rounded-md border-gray-300 focus:border-orange-500"
-                />
-                <button
-                  type="submit"
-                  className="p-2 bg-orange-400 text-white font-semibold rounded-r-md ml-1 cursor-pointer"
-                >
-                  <span>&rarr;</span>
-                </button>
-              </form>
-            </div>
+            {data?.stream?.messages.map((message) => (
+              <LiveMessage
+                key={message.id}
+                {...message}
+                isMe={message.userId === user?.id}
+              />
+            ))}
+          </div>
+          <div className="absoluted bottom-0 w-full py-2">
+            <form onSubmit={handleSubmit(onSubmit)} className="flex w-full">
+              <input
+                {...register("message", { required: true })}
+                type="text"
+                autoComplete="off"
+                className="shadow-md w-full focus:ring-orange-500 rounded-md border-gray-300 focus:border-orange-500"
+              />
+              <button
+                type="submit"
+                className="p-2 bg-orange-400 text-white font-semibold rounded-r-md ml-1 cursor-pointer"
+              >
+                <span>&rarr;</span>
+              </button>
+            </form>
           </div>
         </div>
       </div>

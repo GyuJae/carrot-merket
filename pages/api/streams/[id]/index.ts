@@ -4,12 +4,16 @@ import { Message, Product, Stream, User } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "@libs/server/client";
 
-interface SteamWithMessages extends Stream {
-  messages: Message[];
+export interface MessageWithUserName extends Message {
+  user: { name: string; avatar: string | null };
+}
+
+interface StreamWithMessages extends Stream {
+  messages: MessageWithUserName[];
 }
 
 export interface IStreamDetailResponse extends IResponse {
-  stream?: SteamWithMessages;
+  stream?: StreamWithMessages;
 }
 
 const handler = async (
@@ -39,7 +43,16 @@ const handler = async (
         id: +id.toString(),
       },
       include: {
-        messages: true,
+        messages: {
+          include: {
+            user: {
+              select: {
+                name: true,
+                avatar: true,
+              },
+            },
+          },
+        },
       },
     });
     if (!stream) {
