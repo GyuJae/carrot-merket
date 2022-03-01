@@ -6,6 +6,7 @@ import {
   IEditProfileForm,
   IEditProfileResponse,
 } from "pages/api/users/edit";
+import { useState } from "react";
 import { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
@@ -21,6 +22,7 @@ const Edit: NextPage = () => {
     setError,
     setValue,
     formState: { errors },
+    watch,
   } = useForm<IEditProfileForm>({
     mode: "onChange",
   });
@@ -42,12 +44,14 @@ const Edit: NextPage = () => {
     email,
     phone,
     name,
+    avatar,
   }) => {
     if (email === "" && phone === "") {
       setError("formErrors", {
         message: "Email OR Phone number are required. You need to choose one",
       });
     }
+
     editProfilMutate({ email, phone, name });
   };
 
@@ -57,18 +61,41 @@ const Edit: NextPage = () => {
     if (user?.phone) setValue("phone", user.phone);
   }, [user, setValue]);
 
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const avatar = watch("avatar");
+  useEffect(() => {
+    console.log(avatar);
+    if (avatar && avatar.length > 0) {
+      const file = avatar[0];
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  }, [avatar]);
+
   return (
     <Layout title="Edit Profile" canGoBack>
       <form onSubmit={handleSubmit(onSubmit)} className="py-4 px-4">
         <div className="flex items-center">
-          <div className="w-16 h-16 bg-gray-500 rounded-full" />
+          {avatarPreview ? (
+            <img
+              src={avatarPreview}
+              className="w-16 h-16 bg-gray-500 rounded-full"
+            />
+          ) : (
+            <div className="w-16 h-16 bg-gray-500 rounded-full" />
+          )}
           <label
             htmlFor="avatar"
             className="ml-2 text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
           >
             Change Photo
           </label>
-          <input id="avatar" type="file" accept="image/*" className="hidden" />
+          <input
+            id="avatar"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            {...register("avatar")}
+          />
         </div>
         <div className="flex flex-col py-2">
           <Input

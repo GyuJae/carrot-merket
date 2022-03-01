@@ -8,6 +8,7 @@ export interface IEditProfileForm {
   email?: string;
   phone?: string;
   formErrors?: string;
+  avatar?: FileList;
 }
 
 export interface IEditProfileResponse extends IResponse {}
