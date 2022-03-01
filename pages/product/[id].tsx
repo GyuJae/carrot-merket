@@ -1,4 +1,4 @@
-import { classToString } from "@libs/client/utils";
+import { classToString, fileToUrl } from "@libs/client/utils";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { favToggleFetch } from "pages/api/products/[id]/fav";
@@ -30,10 +30,23 @@ const ItemDetail: NextPage = () => {
   return (
     <Layout title={data?.product ? data.product.name : "Detail"} canGoBack>
       <div className="flex flex-col items-center pb-16 py-3">
-        <div className="w-full h-72 bg-slate-400" />
+        <img
+          src={fileToUrl({ fileId: data?.product?.image, variant: "public" })}
+          className="w-full rounded-md bg-slate-400"
+        />
         <div className="flex flex-col px-2 w-full">
-          <div className="flex py-2 border-b-2">
-            <div className="w-12 h-12 rounded-full bg-pink-300" />
+          <div className="flex py-2 border-b-[1px]">
+            {data?.product?.user.avatar ? (
+              <img
+                src={fileToUrl({
+                  fileId: data.product.user.avatar,
+                  variant: "avatar",
+                })}
+                className="w-12 h-12 rounded-full bg-gray-400"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gray-400" />
+            )}
             <div className="flex flex-col ml-2 justify-center">
               <div className="text-sm font-semibold">
                 {data?.product?.user.name}
@@ -46,7 +59,7 @@ const ItemDetail: NextPage = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col py-2 border-b-2 space-y-1">
+          <div className="flex flex-col py-2 border-b-[1px] space-y-1">
             <h1 className="text-xl font-bold">{data?.product?.name}</h1>
             <h2 className="text-base font-semibold">${data?.product?.price}</h2>
             <p className="text-sm text-justify">{data?.product?.description}</p>

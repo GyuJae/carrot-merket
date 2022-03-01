@@ -1,4 +1,5 @@
 import useUser from "@libs/client/hooks/useUser";
+import { fileToUrl } from "@libs/client/utils";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import {
@@ -40,7 +41,7 @@ const Edit: NextPage = () => {
     }
   );
 
-  const onSubmit: SubmitHandler<IEditProfileForm> = ({
+  const onSubmit: SubmitHandler<IEditProfileForm> = async ({
     email,
     phone,
     name,
@@ -51,8 +52,22 @@ const Edit: NextPage = () => {
         message: "Email OR Phone number are required. You need to choose one",
       });
     }
-
-    editProfilMutate({ email, phone, name });
+    if (avatar && avatar.length > 0) {
+      const { uploadURL } = await (await fetch("/api/files")).json();
+      const form = new FormData();
+      form.append("file", avatar[0], user?.id + "");
+      const {
+        result: { id },
+      } = await (
+        await fetch(uploadURL, {
+          method: "POST",
+          body: form,
+        })
+      ).json();
+      editProfilMutate({ email, phone, name, avatarId: id });
+    } else {
+      editProfilMutate({ email, phone, name });
+    }
   };
 
   useEffect(() => {
@@ -61,10 +76,11 @@ const Edit: NextPage = () => {
     if (user?.phone) setValue("phone", user.phone);
   }, [user, setValue]);
 
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(
+    user?.avatar ? fileToUrl({ fileId: user?.avatar, variant: "avatar" }) : null
+  );
   const avatar = watch("avatar");
   useEffect(() => {
-    console.log(avatar);
     if (avatar && avatar.length > 0) {
       const file = avatar[0];
       setAvatarPreview(URL.createObjectURL(file));

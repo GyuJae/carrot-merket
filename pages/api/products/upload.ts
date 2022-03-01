@@ -11,6 +11,8 @@ export interface IUploadProductForm {
   name: string;
   price: number;
   description: string;
+  photo?: FileList;
+  photoId?: number;
 }
 
 export const uploadProductFetch = (data: IUploadProductForm) =>
@@ -36,7 +38,7 @@ async function handler(
 
     const {
       session: { user },
-      body: { name, price, description },
+      body: { name, price, description, photoId },
     } = req;
     if (!user) {
       return res.status(401).json({
@@ -50,7 +52,7 @@ async function handler(
         name,
         price: +price,
         description,
-        image: "not yet",
+        image: photoId,
       },
       select: {
         id: true,

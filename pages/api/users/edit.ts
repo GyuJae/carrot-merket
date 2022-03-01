@@ -9,6 +9,7 @@ export interface IEditProfileForm {
   phone?: string;
   formErrors?: string;
   avatar?: FileList;
+  avatarId?: number;
 }
 
 export interface IEditProfileResponse extends IResponse {}
@@ -36,7 +37,7 @@ async function handler(
 
     const {
       session: { user },
-      body: { email, phone, name },
+      body: { email, phone, name, avatarId },
     } = req;
     if (!user) {
       return res.status(401).json({
@@ -103,6 +104,16 @@ async function handler(
         data: {
           phone,
           name,
+        },
+      });
+    }
+    if (avatarId) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          avatar: avatarId + "",
         },
       });
     }
