@@ -1,4 +1,6 @@
+import { fileToUrl } from "@libs/client/utils";
 import { Product } from "@prisma/client";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { IProductWithCount } from "pages/api/products";
 
@@ -11,7 +13,13 @@ const Product: React.FC<{ product: IProductWithCount }> = ({ product }) => {
     >
       <div className="flex w-full justify-between cursor-pointer">
         <div className="flex  py-2 px-1 space-x-3">
-          <div className="w-20 h-20 bg-slate-500 rounded-md"></div>
+          <Image
+            src={fileToUrl({ fileId: product.image, variant: "product" })}
+            alt="product"
+            width={80}
+            height={80}
+            className="w-20 h-20 bg-slate-500 rounded-md object-cover"
+          />
           <div className="flex flex-col py-1 space-y-1">
             <div className="text-sm font-semibold">{product.name}</div>
             {/* <div className="text-xs text-gray-400">{product.location}</div> */}

@@ -4,7 +4,8 @@ import { useRouter } from "next/router";
 import useSWR from "swr";
 import Layout from "../../components/layout";
 import { IReviewsResponse } from "pages/api/reviews/index";
-import { classToString, fileT, fileToUrloUrl } from "@libs/client/utils";
+import { classToString, fileToUrl } from "@libs/client/utils";
+import Image from "next/image";
 
 const Profile: NextPage = () => {
   const { user } = useUser();
@@ -15,9 +16,12 @@ const Profile: NextPage = () => {
       <div className="px-4 py-4">
         <div className="flex items-center">
           {user?.avatar ? (
-            <img
+            <Image
               src={fileToUrl({ fileId: user.avatar, variant: "avatar" })}
-              className="w-16 h-16 bg-gray-500 rounded-full"
+              alt="avatar"
+              width={64}
+              height={64}
+              className="w-16 h-16 bg-gray-400 rounded-full"
             />
           ) : (
             <div className="w-16 h-16 bg-gray-500 rounded-full" />
@@ -104,7 +108,19 @@ const Profile: NextPage = () => {
           {data?.reviews?.map((review) => (
             <div key={review.id} className="border-b-[1px] py-2">
               <div className="flex space-x-4 items-center">
-                <div className="w-12 h-12 rounded-full bg-slate-500" />
+                {review.writer.avatar ? (
+                  <Image
+                    alt="avatar"
+                    src={fileToUrl({
+                      fileId: review.writer.avatar,
+                      variant: "avatar",
+                    })}
+                    width={48}
+                    height={48}
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-slate-300" />
+                )}
                 <div>
                   <h4 className="text-sm font-bold text-gray-800">
                     {review.writer.name}

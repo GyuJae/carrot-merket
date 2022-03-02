@@ -1,9 +1,10 @@
 import { classToString, fileToUrl } from "@libs/client/utils";
 import type { NextPage } from "next";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { favToggleFetch } from "pages/api/products/[id]/fav";
 import { IProductDetailResponse } from "pages/api/products/[id]/index";
-import React from "react";
+import React, { useState } from "react";
 import { useMutation } from "react-query";
 import useSWR from "swr";
 import Layout from "../../components/layout";
@@ -27,21 +28,39 @@ const ItemDetail: NextPage = () => {
     toggleFav();
   };
 
+  const [coverImg, setCoverImg] = useState<boolean>(true);
+
   return (
     <Layout title={data?.product ? data.product.name : "Detail"} canGoBack>
-      <div className="flex flex-col items-center pb-16 py-3">
-        <img
-          src={fileToUrl({ fileId: data?.product?.image, variant: "public" })}
-          className="w-full rounded-md bg-slate-400"
+      <div
+        className="relative pb-80 my-2"
+        onClick={() => setCoverImg((prev) => !prev)}
+      >
+        <Image
+          src={fileToUrl({
+            fileId: data?.product?.image as string,
+            variant: "public",
+          })}
+          alt="product image"
+          className={classToString(
+            "bg-black  rounded-md",
+            coverImg ? "object-cover" : "object-scale-down"
+          )}
+          layout="fill"
         />
+      </div>
+      <div className="flex flex-col items-center pb-16 py-3">
         <div className="flex flex-col px-2 w-full">
           <div className="flex py-2 border-b-[1px]">
             {data?.product?.user.avatar ? (
-              <img
+              <Image
                 src={fileToUrl({
                   fileId: data.product.user.avatar,
                   variant: "avatar",
                 })}
+                alt="avatar"
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full bg-gray-400"
               />
             ) : (

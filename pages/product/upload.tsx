@@ -1,5 +1,6 @@
-import { fileToUrl } from "@libs/client/utils";
+import { classToString, fileToUrl } from "@libs/client/utils";
 import type { NextPage } from "next";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import {
   IUploadProductForm,
@@ -16,7 +17,8 @@ import SubmitButton from "../../components/submit-button";
 import Textarea from "../../components/Textarea";
 
 const Upload: NextPage = () => {
-  const { register, handleSubmit, watch } = useForm<IUploadProductForm>();
+  const { register, handleSubmit, watch, reset } =
+    useForm<IUploadProductForm>();
   const router = useRouter();
   const { mutate, isLoading } = useMutation(
     (data: IUploadProductForm) => uploadProductFetch(data),
@@ -53,15 +55,28 @@ const Upload: NextPage = () => {
       setPreviewPhoto(URL.createObjectURL(file));
     }
   }, [photo]);
+
+  const [coverImg, setCoverImg] = useState<boolean>(true);
+
   return (
     <Layout title="Upload Product" canGoBack>
       <div className="py-4 px-4">
         <div>
           {previewPhoto ? (
-            <img
-              src={previewPhoto}
-              className="w-full text-gray-600 h-46 rounded-md"
-            />
+            <div
+              className="relative pb-80 bg-black"
+              onClick={() => setCoverImg((prev) => !prev)}
+            >
+              <Image
+                src={previewPhoto}
+                className={classToString(
+                  "w-full text-gray-600 h-46 rounded-md",
+                  coverImg ? "object-cover" : "object-scale-down"
+                )}
+                layout="fill"
+                alt="preview photo"
+              />
+            </div>
           ) : (
             <label className="w-full h-48 cursor-pointer text-gray-400 hover:text-orange-400 hover:border-orange-400 rounded-md flex justify-center items-center border-dashed border-2">
               <svg

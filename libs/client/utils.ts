@@ -4,7 +4,7 @@ export const classToString = (...classNames: string[]) => {
 
 interface IFileToUrl {
   fileId: string;
-  variant: "avatar" | "public";
+  variant: "avatar" | "product" | "public";
 }
 
 export const fileToUrl = ({ fileId, variant }: IFileToUrl): string =>

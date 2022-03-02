@@ -1,6 +1,7 @@
 import useUser from "@libs/client/hooks/useUser";
 import { fileToUrl } from "@libs/client/utils";
 import type { NextPage } from "next";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import {
   editProfileFetch,
@@ -35,7 +36,7 @@ const Edit: NextPage = () => {
     {
       onSuccess: (res: IEditProfileResponse) => {
         if (res.ok) {
-          router.reload();
+          router.replace("/profile");
         }
       },
     }
@@ -92,8 +93,11 @@ const Edit: NextPage = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="py-4 px-4">
         <div className="flex items-center">
           {avatarPreview ? (
-            <img
+            <Image
               src={avatarPreview}
+              alt="avatar"
+              width={64}
+              height={64}
               className="w-16 h-16 bg-gray-500 rounded-full"
             />
           ) : (
