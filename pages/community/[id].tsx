@@ -162,7 +162,7 @@ const CommunityPostDetail: NextPage = () => {
             placeholder="Answer this question!"
             register={register("answer", { required: true })}
           />
-          <SubmitButton payload={isAnswerLoading ? "loading..." : "Reply"} />
+          <SubmitButton isLoading={isAnswerLoading} payload={"Reply"} />
         </form>
         <div className="px-4 mt-3 space-y-5 ">
           {data?.post?.answers?.map((answer) => (

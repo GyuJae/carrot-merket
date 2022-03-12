@@ -1,7 +1,12 @@
+import useUser from "@libs/client/hooks/useUser";
 import { classToString, fileToUrl } from "@libs/client/utils";
 import type { NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import {
+  createRoomFetch,
+  ICreateRoomResponse,
+} from "pages/api/chats/create-room";
 import { favToggleFetch } from "pages/api/products/[id]/fav";
 import { IProductDetailResponse } from "pages/api/products/[id]/index";
 import React, { useState } from "react";
@@ -11,9 +16,23 @@ import Layout from "../../components/layout";
 
 const ItemDetail: NextPage = () => {
   const router = useRouter();
+  const { user } = useUser();
   const { data, mutate: swrMutate } = useSWR<IProductDetailResponse>(
     router.query.id ? `/api/products/${router.query.id}` : null
   );
+
+  const { mutate: createRoomMutate, isLoading: createRoomIsLoading } =
+    useMutation<ICreateRoomResponse>(
+      () =>
+        createRoomFetch({ sellerId: data?.product?.userId, buyerId: user?.id }),
+      {
+        onSuccess: ({ ok, roomId }) => {
+          if (ok && roomId) {
+            router.push(`/chats/${roomId}`);
+          }
+        },
+      }
+    );
 
   const { mutate: toggleFav } = useMutation(
     () => favToggleFetch(router.query.id as string),
@@ -29,6 +48,11 @@ const ItemDetail: NextPage = () => {
   };
 
   const [coverImg, setCoverImg] = useState<boolean>(true);
+
+  const onClickTalkRoom = () => {
+    if (!user || !data) return;
+    createRoomMutate();
+  };
 
   return (
     <Layout title={data?.product ? data.product.name : "Detail"} canGoBack>
@@ -83,36 +107,41 @@ const ItemDetail: NextPage = () => {
             <h2 className="text-base font-semibold">${data?.product?.price}</h2>
             <p className="text-sm text-justify">{data?.product?.description}</p>
           </div>
-          <div className="bg-white flex items-center py-4 px-1 w-full max-w-xl">
-            <button className="bg-orange-400 w-full text-white rounded-sm py-1 ring-2 ring-offset-1 ring-orange-400 hover:bg-orange-500 active:bg-orange-300">
-              Talk to seller
-            </button>
-            <button
-              onClick={onClickFav}
-              className={classToString(
-                "px-1 py-1 ml-2 rounded-md",
-                data?.isLiked
-                  ? "text-red-600 hover:bg-red-100"
-                  : "text-gray-400 hover:bg-gray-200"
-              )}
-            >
-              <svg
-                className="h-6 w-6 "
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
+          {data?.product?.userId !== user?.id && (
+            <div className="bg-white flex items-center py-4 px-1 w-full max-w-xl">
+              <button
+                onClick={() => onClickTalkRoom()}
+                className="bg-orange-400 w-full text-white rounded-sm py-1 ring-2 ring-offset-1 ring-orange-400 hover:bg-orange-500 active:bg-orange-300"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                />
-              </svg>
-            </button>
-          </div>
+                {createRoomIsLoading ? "loading..." : "Talk to seller"}
+              </button>
+              <button
+                onClick={onClickFav}
+                className={classToString(
+                  "px-1 py-1 ml-2 rounded-md",
+                  data?.isLiked
+                    ? "text-red-600 hover:bg-red-100"
+                    : "text-gray-400 hover:bg-gray-200"
+                )}
+              >
+                <svg
+                  className="h-6 w-6 "
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
           <div className="py-1">
             <h2 className="text-base font-semibold py-1">Similar Items</h2>
             <div className="grid grid-cols-2 gap-2 ">

@@ -1,4 +1,5 @@
 import FloatingButton from "@components/FloatingButton";
+import Loading from "@components/Loading";
 import useCoords from "@libs/client/hooks/useCoords";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -21,60 +22,66 @@ const Communtiy: NextPage = () => {
           동네질문
         </div>
         <div className="flex flex-col">
-          {data?.posts?.map((post) => (
-            <div
-              key={post.id}
-              className="border-b-[1.5px] py-4"
-              onClick={() => router.push(`/community/${post.id}`)}
-            >
-              <div className="font-medium mb-3 flex items-center ">
-                <span className="text-orange-500 font-semibold mr-2 mb-1">
-                  Q.
-                </span>{" "}
-                {post.question}
+          {data ? (
+            data?.posts?.map((post) => (
+              <div
+                key={post.id}
+                className="border-b-[1.5px] py-4"
+                onClick={() => router.push(`/community/${post.id}`)}
+              >
+                <div className="font-medium mb-3 flex items-center ">
+                  <span className="text-orange-500 font-semibold mr-2 mb-1">
+                    Q.
+                  </span>{" "}
+                  {post.question}
+                </div>
+                <div className="flex justify-between items-center text-sm text-gray-400 mb-2">
+                  <span>{post.user.name}</span>
+                  <span>{post.createdAt}</span>
+                </div>
+                <div className="flex space-x-4 font-normal text-sm text-gray-500">
+                  <span className="flex space-x-1 items-center">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    <span>궁금해요 {post._count.wonderings}</span>
+                  </span>
+                  <span className="flex space-x-1 items-center">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      ></path>
+                    </svg>
+                    <span>답변 {post._count.answers}</span>
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between items-center text-sm text-gray-400 mb-2">
-                <span>{post.user.name}</span>
-                <span>{post.createdAt}</span>
-              </div>
-              <div className="flex space-x-4 font-normal text-sm text-gray-500">
-                <span className="flex space-x-1 items-center">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                  <span>궁금해요 {post._count.wonderings}</span>
-                </span>
-                <span className="flex space-x-1 items-center">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                    ></path>
-                  </svg>
-                  <span>답변 {post._count.answers}</span>
-                </span>
-              </div>
+            ))
+          ) : (
+            <div className="flex justify-center items-center py-44">
+              <Loading />
             </div>
-          ))}
+          )}
           <FloatingButton onClick={() => router.push("community/write")}>
             <svg
               className="w-6 h-6"

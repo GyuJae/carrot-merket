@@ -14,7 +14,7 @@ const Product: React.FC<{ product: IProductWithCount }> = ({ product }) => {
       <div className="flex w-full justify-between cursor-pointer">
         <div className="flex  py-2 px-1 space-x-3">
           <Image
-            src={fileToUrl({ fileId: product.image, variant: "product" })}
+            src={fileToUrl({ fileId: product.image, variant: "avatar" })}
             alt="product"
             width={80}
             height={80}
