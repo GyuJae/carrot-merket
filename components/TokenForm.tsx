@@ -43,7 +43,7 @@ const TokenForm: React.FC<IComponentTokenForm> = ({ tokenObj }) => {
           register={register("payload")}
           value={tokenObj.token?.payload}
         />
-        <SubmitButton payload={isLoading ? "loading..." : "Get Payload"} />
+        <SubmitButton isLoading payload={"Get Payload"} />
       </div>
     </form>
   );

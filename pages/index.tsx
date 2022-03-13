@@ -1,11 +1,12 @@
 import type { NextPage } from "next";
 import Product from "../components/Product";
 import Layout from "../components/layout";
-import useSWR from "swr";
-import { IProductsResponse } from "./api/products";
+import useSWR, { SWRConfig } from "swr";
+import { IProductsResponse, IProductWithCount } from "./api/products";
 import { useRouter } from "next/router";
 import FloatingButton from "@components/FloatingButton";
 import Loading from "@components/Loading";
+import client from "@libs/server/client";
 
 const Home: NextPage = () => {
   const { data, error } = useSWR<IProductsResponse>("/api/products");
@@ -56,4 +57,30 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+const Page: NextPage<{ products: IProductWithCount[] }> = ({ products }) => {
+  return (
+    <SWRConfig
+      value={{
+        fallback: {
+          "/api/products": {
+            ok: true,
+            products,
+          },
+        },
+      }}
+    >
+      <Home />
+    </SWRConfig>
+  );
+};
+
+export async function getServerSideProps() {
+  const products = await client?.product.findMany({});
+  return {
+    props: {
+      products: JSON.parse(JSON.stringify(products)),
+    },
+  };
+}
+
+export default Page;

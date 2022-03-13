@@ -3,8 +3,6 @@ import React from "react";
 import { useRouter } from "next/router";
 import { classToString } from "../libs/client/utils";
 import Head from "next/head";
-import { useEffect } from "react";
-import useUser from "@libs/client/hooks/useUser";
 
 interface LayoutProps {
   title?: string;
@@ -24,13 +22,6 @@ export default function Layout({
   const onClick = () => {
     router.back();
   };
-  const { user, isLoading } = useUser();
-  useEffect(() => {
-    if (!user) {
-      if (isLoading) return;
-      router.replace("/enter");
-    }
-  }, [router, user, isLoading]);
 
   return (
     <div>

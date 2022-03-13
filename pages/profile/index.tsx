@@ -1,11 +1,14 @@
 import useUser from "@libs/client/hooks/useUser";
-import { NextPage } from "next";
+import { NextPage, NextPageContext } from "next";
 import { useRouter } from "next/router";
-import useSWR from "swr";
+import useSWR, { SWRConfig } from "swr";
 import Layout from "../../components/layout";
 import { IReviewsResponse } from "pages/api/reviews/index";
 import { classToString, fileToUrl } from "@libs/client/utils";
 import Image from "next/image";
+import { User } from "@prisma/client";
+import { withSsrSession } from "@libs/server/withSession";
+import client from "@libs/server/client";
 
 const Profile: NextPage = () => {
   const { user } = useUser();
@@ -157,4 +160,31 @@ const Profile: NextPage = () => {
   );
 };
 
-export default Profile;
+const Page: NextPage<{ profile: User }> = ({ profile }) => {
+  return (
+    <SWRConfig
+      value={{
+        fallback: {
+          "/api/users/me": { ok: true, profile },
+        },
+      }}
+    >
+      <Profile />
+    </SWRConfig>
+  );
+};
+
+export const getServerSideProps = withSsrSession(async function ({
+  req,
+}: NextPageContext) {
+  const profile = await client?.user.findUnique({
+    where: { id: req?.session.user?.id },
+  });
+  return {
+    props: {
+      profile: JSON.parse(JSON.stringify(profile)),
+    },
+  };
+});
+
+export default Page;
