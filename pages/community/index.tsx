@@ -1,20 +1,33 @@
 import FloatingButton from "@components/FloatingButton";
 import Loading from "@components/Loading";
-import useCoords from "@libs/client/hooks/useCoords";
+// import useCoords from "@libs/client/hooks/useCoords";
+// import { IPostsResponse } from "pages/api/communities/index";
+// import useSWR from "swr";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { IPostsResponse } from "pages/api/communities/index";
-import useSWR from "swr";
 import Layout from "../../components/layout";
+import client from "@libs/server/client";
+import { Post, User } from "@prisma/client";
 
-const Communtiy: NextPage = () => {
+interface IPost extends Post {
+  _count: {
+    answers: number;
+    wonderings: number;
+  };
+  user: User;
+}
+interface ICommuntiy {
+  posts: IPost[];
+}
+
+const Communtiy: NextPage<ICommuntiy> = ({ posts }) => {
   const router = useRouter();
-  const { latitude, longitude } = useCoords();
-  const { data } = useSWR<IPostsResponse>(
-    latitude && longitude
-      ? `/api/communities?latitude=${latitude}&longitude=${longitude}`
-      : null
-  );
+  // const { latitude, longitude } = useCoords();
+  // const { data } = useSWR<IPostsResponse>(
+  //   latitude && longitude
+  //     ? `/api/communities?latitude=${latitude}&longitude=${longitude}`
+  //     : null
+  // );
   return (
     <Layout title="동네생활" hasTabBar>
       <div className="px-4 py-4">
@@ -22,8 +35,8 @@ const Communtiy: NextPage = () => {
           동네질문
         </div>
         <div className="flex flex-col">
-          {data ? (
-            data?.posts?.map((post) => (
+          {posts ? (
+            posts?.map((post) => (
               <div
                 key={post.id}
                 className="border-b-[1.5px] py-4"
@@ -55,7 +68,7 @@ const Communtiy: NextPage = () => {
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                       ></path>
                     </svg>
-                    <span>궁금해요 {post._count.wonderings}</span>
+                    <span>궁금해요 {post._count?.wonderings}</span>
                   </span>
                   <span className="flex space-x-1 items-center">
                     <svg
@@ -72,7 +85,7 @@ const Communtiy: NextPage = () => {
                         d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                       ></path>
                     </svg>
-                    <span>답변 {post._count.answers}</span>
+                    <span>답변 {post._count?.answers}</span>
                   </span>
                 </div>
               </div>
@@ -102,6 +115,15 @@ const Communtiy: NextPage = () => {
       </div>
     </Layout>
   );
+};
+
+export const getStaticProps = async () => {
+  const posts = await client?.post.findMany({ include: { user: true } });
+  return {
+    props: {
+      posts: JSON.parse(JSON.stringify(posts)),
+    },
+  };
 };
 
 export default Communtiy;

@@ -74,6 +74,9 @@ const handler = async (
         },
       },
     });
+
+    await res.unstable_revalidate("/community");
+
     return res.json({
       ok: true,
       post,

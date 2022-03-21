@@ -1,6 +1,6 @@
 import useUser from "@libs/client/hooks/useUser";
 import { classToString, fileToUrl } from "@libs/client/utils";
-import type { NextPage } from "next";
+import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import {
@@ -13,18 +13,22 @@ import React, { useState } from "react";
 import { useMutation } from "react-query";
 import useSWR from "swr";
 import Layout from "../../components/layout";
+import client from "@libs/server/client";
 
-const ItemDetail: NextPage = () => {
+const ItemDetail: NextPage<IProductDetailResponse> = ({
+  product,
+  similarProducts,
+  isLiked,
+}) => {
   const router = useRouter();
   const { user } = useUser();
-  const { data, mutate: swrMutate } = useSWR<IProductDetailResponse>(
-    router.query.id ? `/api/products/${router.query.id}` : null
-  );
+  // const { data, mutate: swrMutate } = useSWR<IProductDetailResponse>(
+  //   router.query.id ? `/api/products/${router.query.id}` : null
+  // );
 
   const { mutate: createRoomMutate, isLoading: createRoomIsLoading } =
     useMutation<ICreateRoomResponse>(
-      () =>
-        createRoomFetch({ sellerId: data?.product?.userId, buyerId: user?.id }),
+      () => createRoomFetch({ sellerId: product?.userId, buyerId: user?.id }),
       {
         onSuccess: ({ ok, roomId }) => {
           if (ok && roomId) {
@@ -42,27 +46,27 @@ const ItemDetail: NextPage = () => {
   );
 
   const onClickFav = () => {
-    if (!data) return;
-    swrMutate({ ...data, isLiked: !data.isLiked }, false);
+    if (!product) return;
+    // swrMutate({ ...product, isLiked: !isLiked }, false);
     toggleFav();
   };
 
   const [coverImg, setCoverImg] = useState<boolean>(true);
 
   const onClickTalkRoom = () => {
-    if (!user || !data) return;
+    if (!user || !product) return;
     createRoomMutate();
   };
 
   return (
-    <Layout title={data?.product ? data.product.name : "Detail"} canGoBack>
+    <Layout title={product ? product.name : "Detail"} canGoBack>
       <div
         className="relative pb-80 my-2"
         onClick={() => setCoverImg((prev) => !prev)}
       >
         <Image
           src={fileToUrl({
-            fileId: data?.product?.image as string,
+            fileId: product?.image as string,
             variant: "public",
           })}
           alt="product image"
@@ -76,10 +80,10 @@ const ItemDetail: NextPage = () => {
       <div className="flex flex-col items-center pb-16 py-3">
         <div className="flex flex-col px-2 w-full">
           <div className="flex py-2 border-b-[1px]">
-            {data?.product?.user.avatar ? (
+            {product?.user.avatar ? (
               <Image
                 src={fileToUrl({
-                  fileId: data.product.user.avatar,
+                  fileId: product.user.avatar,
                   variant: "avatar",
                 })}
                 alt="avatar"
@@ -91,23 +95,21 @@ const ItemDetail: NextPage = () => {
               <div className="w-12 h-12 rounded-full bg-gray-400" />
             )}
             <div className="flex flex-col ml-2 justify-center">
-              <div className="text-sm font-semibold">
-                {data?.product?.user.name}
-              </div>
+              <div className="text-sm font-semibold">{product?.user.name}</div>
               <div
                 className="text-xs opacity-75 cursor-pointer hover:underline"
-                onClick={() => router.push(`/users/${data?.product?.userId}`)}
+                onClick={() => router.push(`/users/${product?.userId}`)}
               >
                 View Detail
               </div>
             </div>
           </div>
           <div className="flex flex-col py-2 border-b-[1px] space-y-1">
-            <h1 className="text-xl font-bold">{data?.product?.name}</h1>
-            <h2 className="text-base font-semibold">${data?.product?.price}</h2>
-            <p className="text-sm text-justify">{data?.product?.description}</p>
+            <h1 className="text-xl font-bold">{product?.name}</h1>
+            <h2 className="text-base font-semibold">${product?.price}</h2>
+            <p className="text-sm text-justify">{product?.description}</p>
           </div>
-          {data?.product?.userId !== user?.id && (
+          {product?.userId !== user?.id && (
             <div className="bg-white flex items-center py-4 px-1 w-full max-w-xl">
               <button
                 onClick={() => onClickTalkRoom()}
@@ -119,7 +121,7 @@ const ItemDetail: NextPage = () => {
                 onClick={onClickFav}
                 className={classToString(
                   "px-1 py-1 ml-2 rounded-md",
-                  data?.isLiked
+                  isLiked
                     ? "text-red-600 hover:bg-red-100"
                     : "text-gray-400 hover:bg-gray-200"
                 )}
@@ -145,8 +147,8 @@ const ItemDetail: NextPage = () => {
           <div className="py-1">
             <h2 className="text-base font-semibold py-1">Similar Items</h2>
             <div className="grid grid-cols-2 gap-2 ">
-              {data?.similarProducts &&
-                data.similarProducts.map((product) => (
+              {similarProducts &&
+                similarProducts.map((product) => (
                   <div
                     key={product.id}
                     className="w-full cursor-pointer"
@@ -163,6 +165,59 @@ const ItemDetail: NextPage = () => {
       </div>
     </Layout>
   );
+};
+
+export const getStaticPaths: GetStaticPaths = () => {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
+};
+
+export const getStaticProps: GetStaticProps = async (ctx) => {
+  if (!ctx?.params?.id) {
+    return {
+      props: {},
+    };
+  }
+  const product = await client?.product.findUnique({
+    where: {
+      id: +ctx.params.id.toString(),
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          avatar: true,
+        },
+      },
+    },
+  });
+  const terms = product?.name.split(" ").map((word) => ({
+    name: {
+      contains: word,
+    },
+  }));
+  const relatedProducts = await client?.product.findMany({
+    where: {
+      OR: terms,
+      AND: {
+        id: {
+          not: product?.id,
+        },
+      },
+    },
+  });
+  const isLiked = false;
+  await new Promise((resolve) => setTimeout(resolve, 10000));
+  return {
+    props: {
+      product: JSON.parse(JSON.stringify(product)),
+      relatedProducts: JSON.parse(JSON.stringify(relatedProducts)),
+      isLiked,
+    },
+  };
 };
 
 export default ItemDetail;
