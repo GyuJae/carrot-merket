@@ -6,39 +6,110 @@ import Layout from "../../components/layout";
 import { IReviewsResponse } from "pages/api/reviews/index";
 import { classToString, fileToUrl } from "@libs/client/utils";
 import Image from "next/image";
-import { User } from "@prisma/client";
-import { withSsrSession } from "@libs/server/withSession";
-import client from "@libs/server/client";
+// import { User } from "@prisma/client";
+// import { withSsrSession } from "@libs/server/withSession";
+// import client from "@libs/server/client";
+import { Suspense } from "react";
+import Loading from "@components/Loading";
 
-const Profile: NextPage = () => {
+const SuspenseLoading = () => {
+  return (
+    <div className="flex justify-center items-center py-10">
+      <Loading />
+    </div>
+  );
+};
+
+const ProfileHeader = () => {
   const { user } = useUser();
   const router = useRouter();
+  return (
+    <div className="flex items-center">
+      {user?.avatar ? (
+        <Image
+          src={fileToUrl({ fileId: user.avatar, variant: "avatar" })}
+          alt="avatar"
+          width={64}
+          height={64}
+          className="w-16 h-16 bg-gray-400 rounded-full"
+        />
+      ) : (
+        <div className="w-16 h-16 bg-gray-500 rounded-full" />
+      )}
+      <div className="flex flex-col ml-3">
+        <span className="font-semibold text-sm">{user?.name}</span>
+        <span
+          className="text-gray-500 text-xs cursor-pointer hover:underline active:text-gray-300"
+          onClick={() => router.push("/profile/edit")}
+        >
+          Edit profile &rarr;
+        </span>
+      </div>
+    </div>
+  );
+};
+
+const Reviews = () => {
   const { data } = useSWR<IReviewsResponse>("/api/reviews");
+  return (
+    <>
+      {data?.reviews?.map((review) => (
+        <div key={review.id} className="border-b-[1px] py-2">
+          <div className="flex space-x-4 items-center">
+            {review.writer.avatar ? (
+              <Image
+                alt="avatar"
+                src={fileToUrl({
+                  fileId: review.writer.avatar,
+                  variant: "avatar",
+                })}
+                width={48}
+                height={48}
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-slate-300" />
+            )}
+            <div>
+              <h4 className="text-sm font-bold text-gray-800">
+                {review.writer.name}
+              </h4>
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg
+                    key={star}
+                    className={classToString(
+                      "h-5 w-5",
+                      review.score >= star ? "text-yellow-400" : "text-gray-400"
+                    )}
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 text-gray-600 text-sm">
+            <p>{review.review}</p>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+};
+
+const Profile: NextPage = () => {
+  const router = useRouter();
+
   return (
     <Layout title="나의 캐럿" hasTabBar>
       <div className="px-4 py-4">
-        <div className="flex items-center">
-          {user?.avatar ? (
-            <Image
-              src={fileToUrl({ fileId: user.avatar, variant: "avatar" })}
-              alt="avatar"
-              width={64}
-              height={64}
-              className="w-16 h-16 bg-gray-400 rounded-full"
-            />
-          ) : (
-            <div className="w-16 h-16 bg-gray-500 rounded-full" />
-          )}
-          <div className="flex flex-col ml-3">
-            <span className="font-semibold text-sm">{user?.name}</span>
-            <span
-              className="text-gray-500 text-xs cursor-pointer hover:underline active:text-gray-300"
-              onClick={() => router.push("/profile/edit")}
-            >
-              Edit profile &rarr;
-            </span>
-          </div>
-        </div>
+        <Suspense fallback={<SuspenseLoading />}>
+          <ProfileHeader />
+        </Suspense>
         <div className="flex justify-around py-10">
           <div className="flex flex-col items-center">
             <div
@@ -108,65 +179,20 @@ const Profile: NextPage = () => {
           </div>
         </div>
         <div>
-          {data?.reviews?.map((review) => (
-            <div key={review.id} className="border-b-[1px] py-2">
-              <div className="flex space-x-4 items-center">
-                {review.writer.avatar ? (
-                  <Image
-                    alt="avatar"
-                    src={fileToUrl({
-                      fileId: review.writer.avatar,
-                      variant: "avatar",
-                    })}
-                    width={48}
-                    height={48}
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-slate-300" />
-                )}
-                <div>
-                  <h4 className="text-sm font-bold text-gray-800">
-                    {review.writer.name}
-                  </h4>
-                  <div className="flex items-center">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <svg
-                        key={star}
-                        className={classToString(
-                          "h-5 w-5",
-                          review.score >= star
-                            ? "text-yellow-400"
-                            : "text-gray-400"
-                        )}
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 text-gray-600 text-sm">
-                <p>{review.review}</p>
-              </div>
-            </div>
-          ))}
+          <Suspense fallback={<SuspenseLoading />}>
+            <Reviews />
+          </Suspense>
         </div>
       </div>
     </Layout>
   );
 };
 
-const Page: NextPage<{ profile: User }> = ({ profile }) => {
+const Page: NextPage = () => {
   return (
     <SWRConfig
       value={{
-        fallback: {
-          "/api/users/me": { ok: true, profile },
-        },
+        suspense: true,
       }}
     >
       <Profile />
@@ -174,17 +200,17 @@ const Page: NextPage<{ profile: User }> = ({ profile }) => {
   );
 };
 
-export const getServerSideProps = withSsrSession(async function ({
-  req,
-}: NextPageContext) {
-  const profile = await client?.user.findUnique({
-    where: { id: req?.session.user?.id },
-  });
-  return {
-    props: {
-      profile: JSON.parse(JSON.stringify(profile)),
-    },
-  };
-});
+// export const getServerSideProps = withSsrSession(async function ({
+//   req,
+// }: NextPageContext) {
+//   const profile = await client?.user.findUnique({
+//     where: { id: req?.session.user?.id },
+//   });
+//   return {
+//     props: {
+//       profile: JSON.parse(JSON.stringify(profile)),
+//     },
+//   };
+// });
 
 export default Page;
